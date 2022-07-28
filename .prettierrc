@@ -6,7 +6,7 @@
     "useTabs": false,
     "overrides": [
         {
-            "files": ["*.js", "*.scss", "*.css"],
+            "files": ["*.js", "*.tsx", "*.scss", "*.css"],
             "options": {
                 "printWidth": 80,
                 "tabWidth": 2

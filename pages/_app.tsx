@@ -1,12 +1,11 @@
-import "../styles/globals.css";
+import { AppProps } from "next/app";
 import { ChakraProvider } from "@chakra-ui/react";
+import "../styles/globals.scss";
 
-function MyApp({ Component, pageProps }) {
+export default function OpenBatch({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider>
       <Component {...pageProps} />
     </ChakraProvider>
   );
 }
-
-export default MyApp;
