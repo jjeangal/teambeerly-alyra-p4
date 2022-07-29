@@ -28,10 +28,20 @@ export default function Home() {
           </Text>
 
           <HStack mb={"5em"} spacing={"5"}>
-            <Button bg={"purple.800"} color={"white"}>
+            <Button
+              colorScheme={"purple"}
+              bg={"purple.800"}
+              color={"white"}
+              variant="solid"
+            >
               Explore
             </Button>
-            <Button bg={"orange.400"} color={"white"}>
+            <Button
+              colorScheme={"orange"}
+              bg={"orange.400"}
+              color={"white"}
+              variant="solid"
+            >
               Create
             </Button>
           </HStack>
