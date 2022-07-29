@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FaWallet } from "react-icons/fa";
 import { useAddress } from "@thirdweb-dev/react";
 import { AccountAddress } from "../AccountAddress/AccountAddress";
-import { Sidebar } from "../sidebar/Sidebar";
+import { Sidebar } from "../Sidebar/Sidebar";
 
 export default function Header() {
   const address = useAddress();
