@@ -14,7 +14,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import CardLg from "../components/cards/Card-lg";
-import Layout from "../components/layout/Layout";
+import Layout from "../components/Layout/Layout";
 import styles from "../styles/Home.module.scss";
 
 export default function Home() {

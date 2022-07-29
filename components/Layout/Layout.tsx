@@ -1,4 +1,4 @@
-import Header from "../header/header";
+import Header from "../Header/Header";
 import styles from "./Layout.module.scss";
 
 type LayoutProps = {

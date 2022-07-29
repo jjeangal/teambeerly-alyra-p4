@@ -1,36 +1,14 @@
-import {
-  Box,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  Flex,
-  IconButton,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, IconButton, Text, useDisclosure } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
 import { FaWallet } from "react-icons/fa";
 import { useAddress } from "@thirdweb-dev/react";
-import { AccountAddress } from "../account-address/account-address";
-import { ConnectWalletsButtons } from "../connect-wallet-btn/Connect-wallet-btn";
+import { AccountAddress } from "../AccountAddress/AccountAddress";
+import { Sidebar } from "../sidebar/Sidebar";
 
 export default function Header() {
   const address = useAddress();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  // TODO: Put drawer in a sidebar component
-  const MobileNavContent = (
-    <Drawer isOpen={!address && isOpen} placement="right" onClose={onClose}>
-      <DrawerContent>
-        <DrawerCloseButton onClick={onClose} />
-        <DrawerHeader />
-        <DrawerBody>{!address && <ConnectWalletsButtons />}</DrawerBody>
-      </DrawerContent>
-    </Drawer>
-  );
+  const { isOpen, onOpen } = useDisclosure();
 
   return (
     <>
@@ -76,7 +54,7 @@ export default function Header() {
               )}
             </Flex>
           </Flex>
-          {MobileNavContent}
+          <Sidebar isOpen={isOpen} />
         </Box>
       </Box>
     </>

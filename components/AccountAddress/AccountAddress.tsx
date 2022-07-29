@@ -6,7 +6,7 @@ export const AccountAddress = () => {
   const address = useAddress();
   return (
     <>
-      <Tag size="lg" colorScheme="teal" borderRadius="full">
+      <Tag size="lg" colorScheme="orange" borderRadius="full">
         {address ? (
           <>
             <Avatar src={getAvatar(address)} size="xs" ml={-1} mr={2} />
