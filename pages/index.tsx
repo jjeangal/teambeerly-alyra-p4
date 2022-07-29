@@ -13,6 +13,7 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
+import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
 import styles from "../styles/Home.module.scss";
@@ -27,22 +28,27 @@ export default function Home() {
           </Text>
 
           <HStack mb={"5em"} spacing={"5"}>
-            <Button
-              colorScheme={"purple"}
-              bg={"purple.800"}
-              color={"white"}
-              variant="solid"
-            >
-              Explore
-            </Button>
-            <Button
-              colorScheme={"orange"}
-              bg={"orange.400"}
-              color={"white"}
-              variant="solid"
-            >
-              Create
-            </Button>
+            <Link href="/search-results">
+              <Button
+                colorScheme={"purple"}
+                bg={"purple.800"}
+                color={"white"}
+                variant="solid"
+              >
+                <a>Explore</a>
+              </Button>
+            </Link>
+
+            <Link href="/create-collection">
+              <Button
+                colorScheme={"orange"}
+                bg={"orange.400"}
+                color={"white"}
+                variant="solid"
+              >
+                <a>Create</a>
+              </Button>
+            </Link>
           </HStack>
 
           <Wrap mb={"5em"} py={5} spacing="50px" justify="center">

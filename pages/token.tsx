@@ -1,3 +1,7 @@
+import Layout from "../components/Layout/Layout";
+
+// TODO: Use https://nextjs.org/docs/routing/dynamic-routes
+
 export default function Token() {
-  return <>Token Page</>;
+  return <Layout>Token Page</Layout>;
 }

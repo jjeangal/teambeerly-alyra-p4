@@ -1,3 +1,5 @@
+import Layout from "../components/Layout/Layout";
+
 export default function CreateCollection() {
-  return <>CreateCollection Page</>;
+  return <Layout>CreateCollection Page</Layout>;
 }

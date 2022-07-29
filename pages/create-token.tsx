@@ -1,3 +1,5 @@
+import Layout from "../components/Layout/Layout";
+
 export default function CreateToken() {
-  return <>CreateToken Page</>;
+  return <Layout>CreateToken Token Page</Layout>;
 }

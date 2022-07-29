@@ -1,3 +1,5 @@
+import Layout from "../components/Layout/Layout";
+
 export default function SearchResults() {
-  return <>SearchResults Page</>;
+  return <Layout>SearchResults Page</Layout>;
 }

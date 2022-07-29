@@ -27,7 +27,12 @@ export default function Header() {
           <Flex w="full" h="full" px="6" align="center" justify="space-between">
             <Flex align="center">
               <Link href="/">
-                <Text fontSize="25px" fontWeight={800} color="purple.800">
+                <Text
+                  fontSize="25px"
+                  fontWeight={800}
+                  color="purple.800"
+                  cursor="pointer"
+                >
                   OpenBatch
                 </Text>
               </Link>

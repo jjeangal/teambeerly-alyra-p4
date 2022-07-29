@@ -1,3 +1,5 @@
+import Layout from "../components/Layout/Layout";
+
 export default function Profile() {
-  return <>Profile Page</>;
+  return <Layout>Profile Page</Layout>;
 }
