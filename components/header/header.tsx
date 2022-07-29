@@ -4,7 +4,6 @@ import {
   DrawerBody,
   DrawerCloseButton,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   Flex,
   IconButton,
@@ -13,21 +12,22 @@ import {
 } from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { FaWallet } from "react-icons/fa";
+import { useAddress } from "@thirdweb-dev/react";
+import { AccountAddress } from "../account-address/account-address";
+import { ConnectWalletsButtons } from "../connect-wallet-btn/Connect-wallet-btn";
 
 export default function Header() {
+  const address = useAddress();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // TODO: Put drawer in a sidebar component
   const MobileNavContent = (
-    <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+    <Drawer isOpen={!address && isOpen} placement="right" onClose={onClose}>
       <DrawerContent>
         <DrawerCloseButton onClick={onClose} />
-        <DrawerHeader>Wallet address</DrawerHeader>
-
-        <DrawerBody>Drawer body content here</DrawerBody>
-
-        <DrawerFooter>Drawer footer content here</DrawerFooter>
+        <DrawerHeader />
+        <DrawerBody>{!address && <ConnectWalletsButtons />}</DrawerBody>
       </DrawerContent>
     </Drawer>
   );
@@ -55,16 +55,25 @@ export default function Header() {
               </Link>
             </Flex>
 
-            <Flex justify="flex-end" w="full" align="center" color="gray.400">
-              <IconButton
-                display="flex"
-                aria-label="Open menu"
-                fontSize="20px"
-                color="gray.800"
-                variant="ghost"
-                icon={<HamburgerIcon />}
-                onClick={onOpen}
-              />
+            <Flex
+              justify="flex-end"
+              w="full"
+              gap={5}
+              align="center"
+              color="gray.400"
+            >
+              <AccountAddress />
+              {!address && (
+                <IconButton
+                  display="flex"
+                  aria-label="Open menu"
+                  fontSize="20px"
+                  color="gray.800"
+                  variant="ghost"
+                  icon={<FaWallet />}
+                  onClick={onOpen}
+                />
+              )}
             </Flex>
           </Flex>
           {MobileNavContent}
