@@ -11,14 +11,15 @@ import { ConnectWalletsButtons } from "../ConnectWalletsButtons/ConnectWalletsBu
 
 type SidebarProps = {
   isOpen: boolean;
+  closeEvent: any;
 };
 
-export const Sidebar = ({ isOpen }: SidebarProps) => {
+export const Sidebar = ({ isOpen, closeEvent }: SidebarProps) => {
   const address = useAddress();
   const { onClose } = useDisclosure();
 
   return (
-    <Drawer isOpen={!address && isOpen} placement="right" onClose={onClose}>
+    <Drawer isOpen={isOpen} placement="right" onClose={closeEvent}>
       <DrawerContent>
         <DrawerCloseButton onClick={onClose} />
         <DrawerHeader />

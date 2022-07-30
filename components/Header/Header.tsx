@@ -8,7 +8,7 @@ import { Sidebar } from "../Sidebar/Sidebar";
 
 export default function Header() {
   const address = useAddress();
-  const { isOpen, onOpen } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <>
@@ -59,7 +59,7 @@ export default function Header() {
               )}
             </Flex>
           </Flex>
-          <Sidebar isOpen={isOpen} />
+          <Sidebar isOpen={isOpen} closeEvent={onClose} />
         </Box>
       </Box>
     </>
