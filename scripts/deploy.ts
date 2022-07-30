@@ -1,18 +1,23 @@
 import { ethers } from "hardhat";
 
 async function main() {
-    const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+    const [deployer] = await ethers.getSigners();
 
-    const lockedAmount = ethers.utils.parseEther("1");
+    //Deploy Info
+    console.log("Deploying contracts with the account:", deployer.address);
+    console.log("Account balance:", (await deployer.getBalance()).toString());
 
-    const Lock = await ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    // NFT contract
+    const NFT = await ethers.getContractFactory("NFT");
+    const nft = await NFT.deploy();
+    await nft.deployed();
+    console.log("Contract NFT deployed to:", nft.address);
 
-    await lock.deployed();
-
-    console.log("Lock with 1 ETH deployed to:", lock.address);
+    // Marketplace contract
+    const Marketplace = await ethers.getContractFactory("Marketplace");
+    const marketplace = await Marketplace.deploy(1);
+    await marketplace.deployed();
+    console.log("Contract Marketplace deployed to:", marketplace.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
