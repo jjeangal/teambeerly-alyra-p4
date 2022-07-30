@@ -14,13 +14,20 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.0.4",
     "@chakra-ui/react": "^2.2.4",
+    "@dicebear/avatars": "^4.10.3",
+    "@dicebear/avatars-identicon-sprites": "^4.10.3",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@thirdweb-dev/react": "^2.5.1",
+    "@thirdweb-dev/sdk": "^2.3.32",
     "framer-motion": "^6.5.1",
     "next": "12.2.3",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-icons": "^4.4.0",
+    "sass": "^1.54.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.1.0",
