@@ -6,12 +6,17 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useCoinbaseWallet, useMetamask } from "@thirdweb-dev/react";
+import {
+  useCoinbaseWallet,
+  useMetamask,
+  useWalletConnect,
+} from "@thirdweb-dev/react";
 import Image from "next/image";
 
 export const ConnectWalletsButtons = () => {
   const connectWithMetamask = useMetamask();
   const connectWithCoinbaseWallet = useCoinbaseWallet();
+  const connectWithWalletConnect = useWalletConnect();
 
   return (
     <>
@@ -42,6 +47,16 @@ export const ConnectWalletsButtons = () => {
             >
               <Image src="/coinbase.webp" width={24} height={24} />
               <Text ml={3}>Coinbase</Text>
+            </Button>
+          </Box>
+          <Box>
+            <Button
+              colorScheme="black"
+              variant="outline"
+              onClick={connectWithWalletConnect}
+            >
+              <Image src="/coinbase.webp" width={24} height={24} />
+              <Text ml={3}>WalletConnect</Text>
             </Button>
           </Box>
         </VStack>
