@@ -1,4 +1,11 @@
-import { Box, Flex, IconButton, Text, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Image,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Head from "next/head";
 import Link from "next/link";
 import { FaWallet } from "react-icons/fa";
@@ -26,6 +33,10 @@ export default function Header() {
         >
           <Flex w="full" h="full" px="6" align="center" justify="space-between">
             <Flex align="center">
+              <Box mt={"2px"} mr={"15px"}>
+                <Image w="60px" src="/logo.png" alt="OpenBatch logo" />
+              </Box>
+
               <Link href="/">
                 <Text
                   fontSize="25px"

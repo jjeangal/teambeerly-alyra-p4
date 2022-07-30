@@ -23,7 +23,9 @@ export const Sidebar = ({ isOpen, closeEvent }: SidebarProps) => {
       <DrawerContent>
         <DrawerCloseButton onClick={onClose} />
         <DrawerHeader />
-        <DrawerBody>{!address && <ConnectWalletsButtons />}</DrawerBody>
+        <DrawerBody>
+          {!address && <ConnectWalletsButtons connectedEvent={closeEvent} />}
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

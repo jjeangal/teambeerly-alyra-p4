@@ -13,10 +13,38 @@ import {
 } from "@thirdweb-dev/react";
 import Image from "next/image";
 
-export const ConnectWalletsButtons = () => {
+type SidebarProps = {
+  connectedEvent: any;
+};
+
+export const ConnectWalletsButtons = ({ connectedEvent }: SidebarProps) => {
   const connectWithMetamask = useMetamask();
   const connectWithCoinbaseWallet = useCoinbaseWallet();
   const connectWithWalletConnect = useWalletConnect();
+
+  function connectMM() {
+    connectWithMetamask()
+      .then(() => {
+        connectedEvent();
+      })
+      .catch(console.log);
+  }
+
+  function connectCoinbase() {
+    connectWithCoinbaseWallet()
+      .then(() => {
+        connectedEvent();
+      })
+      .catch(console.log);
+  }
+
+  function connectWalletConnect() {
+    connectWithWalletConnect()
+      .then(() => {
+        connectedEvent();
+      })
+      .catch(console.log);
+  }
 
   return (
     <>
@@ -30,11 +58,7 @@ export const ConnectWalletsButtons = () => {
           align="center"
         >
           <Box>
-            <Button
-              colorScheme="black"
-              variant="outline"
-              onClick={connectWithMetamask}
-            >
+            <Button colorScheme="black" variant="outline" onClick={connectMM}>
               <Image src="/metamask-fox.svg" width={24} height={24} />
               <Text ml={3}>Metamask</Text>
             </Button>
@@ -43,7 +67,7 @@ export const ConnectWalletsButtons = () => {
             <Button
               colorScheme="black"
               variant="outline"
-              onClick={connectWithCoinbaseWallet}
+              onClick={connectCoinbase}
             >
               <Image src="/coinbase.webp" width={24} height={24} />
               <Text ml={3}>Coinbase</Text>
@@ -53,9 +77,9 @@ export const ConnectWalletsButtons = () => {
             <Button
               colorScheme="black"
               variant="outline"
-              onClick={connectWithWalletConnect}
+              onClick={connectWalletConnect}
             >
-              <Image src="/coinbase.webp" width={24} height={24} />
+              <Image src="/wallet-connect.png" width={24} height={24} />
               <Text ml={3}>WalletConnect</Text>
             </Button>
           </Box>
