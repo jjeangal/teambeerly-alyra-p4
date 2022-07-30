@@ -1,5 +1,6 @@
-import { Box, Image, Link } from "@chakra-ui/react";
+import { Avatar, Box, HStack, Image, Link } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/react";
+import { defaultItemImage } from "../../services/utils";
 
 interface CardProps {
   imageUrl?: string;
@@ -7,29 +8,41 @@ interface CardProps {
 }
 
 export default function CardLg({ imageUrl, avatar }: CardProps) {
-  const _imageUrl =
-    imageUrl ||
-    "https://images.unsplash.com/photo-1613542231149-63eb74d8b4ef?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1972&q=80";
-
   return (
-    <Box
-      w="385px"
-      bg="white"
-      shadow="lg"
-      rounded="lg"
-      overflow="hidden"
-      cursor={"pointer"}
-    >
-      <Image w="full" h={"350px"} fit="cover" src={_imageUrl} alt="avatar" />
+    <Box w="385px" bg="white" shadow="lg" rounded="lg" overflow="hidden">
+      <Link>
+        {/* TODO: Add link to /collection with the ID */}
+        <Image
+          w="full"
+          h={"350px"}
+          fit="cover"
+          src={imageUrl}
+          alt="item"
+          fallbackSrc={defaultItemImage}
+        />
+      </Link>
 
-      <Box p={5} textAlign="left">
-        <Link display="block" fontSize="2xl" color="gray.800" fontWeight="bold">
-          Colorz
-        </Link>
-        <chakra.span fontSize="sm" color="gray.700">
-          by Zoonies
-        </chakra.span>
-      </Box>
+      <HStack p={5} spacing={5}>
+        <Box>
+          <Avatar name="NC" src={avatar} />
+        </Box>
+        <Box textAlign="left">
+          <Link
+            display="block"
+            fontSize="2xl"
+            color="gray.800"
+            fontWeight="bold"
+          >
+            Colorz
+          </Link>
+          by&nbsp;
+          <chakra.span fontSize="sm" color="gray.700" fontWeight="bold">
+            <Link fontSize="sm" color="gray.700" fontWeight="bold">
+              Zoonies
+            </Link>
+          </chakra.span>
+        </Box>
+      </HStack>
     </Box>
   );
 }

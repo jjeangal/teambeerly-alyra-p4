@@ -1,4 +1,8 @@
+import "swiper/css";
+import "swiper/css/pagination";
+import styles from "../styles/Home.module.scss";
 import {
+  Box,
   Button,
   Center,
   HStack,
@@ -10,15 +14,30 @@ import {
   Th,
   Thead,
   Tr,
-  Wrap,
-  WrapItem,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import styles from "../styles/Home.module.scss";
+import { getAvatar } from "../services/utils";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper";
 
 export default function Home() {
+  const collections = [
+    {
+      avatar: getAvatar("lorem"),
+    },
+    {
+      avatar: getAvatar("ipsum"),
+    },
+    {
+      avatar: getAvatar("dolor"),
+    },
+    {
+      avatar: getAvatar("amet"),
+    },
+  ];
+
   return (
     <>
       <Layout>
@@ -51,17 +70,20 @@ export default function Home() {
             </Link>
           </HStack>
 
-          <Wrap mb={"5em"} py={5} spacing="50px" justify="center">
-            <WrapItem>
-              <CardLg></CardLg>
-            </WrapItem>
-            <WrapItem>
-              <CardLg></CardLg>
-            </WrapItem>
-            <WrapItem>
-              <CardLg></CardLg>
-            </WrapItem>
-          </Wrap>
+          <Box mb={"5em"}>
+            <Swiper
+              slidesPerView={3}
+              navigation={true}
+              modules={[Navigation]}
+              className={styles.swiper}
+            >
+              {collections.map((collection) => (
+                <SwiperSlide className={styles.swiper_slide}>
+                  <CardLg avatar={collection.avatar}></CardLg>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </Box>
 
           <Text mb={"1em"} fontSize={36} fontWeight={700}>
             Top collections

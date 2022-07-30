@@ -1,4 +1,4 @@
-import { Avatar, IconButton, Tag, TagLabel, Text } from "@chakra-ui/react";
+import { Avatar, IconButton, Tag, TagLabel } from "@chakra-ui/react";
 import { useAddress, useDisconnect } from "@thirdweb-dev/react";
 import Link from "next/link";
 import { FaSignOutAlt } from "react-icons/fa";
