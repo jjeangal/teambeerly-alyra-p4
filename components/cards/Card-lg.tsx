@@ -25,7 +25,7 @@ export default function CardLg({ imageUrl, avatar }: CardProps) {
           src={imageUrl}
           alt="item"
           onLoad={handleImageLoaded}
-          fallback={<Skeleton h={"350px"} isLoaded={imageLoaded} />}
+          fallback={<Skeleton h={"350px"} isLoaded={!imageLoaded} />}
         />
       </Link>
 

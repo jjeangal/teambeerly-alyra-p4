@@ -26,27 +26,19 @@ export default function Home() {
   const collections = [
     {
       avatar: getAvatar("lorem"),
-      imageUrl: getImageUrl(
-        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/4.png"
-      ),
+      imageUrl: getImageUrl("20.png"),
     },
     {
       avatar: getAvatar("ipsum"),
-      imageUrl: getImageUrl(
-        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/5.png"
-      ),
+      imageUrl: getImageUrl("21.png"),
     },
     {
       avatar: getAvatar("dolor"),
-      imageUrl: getImageUrl(
-        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/6.png"
-      ),
+      imageUrl: getImageUrl("22.png"),
     },
     {
       avatar: getAvatar("amet"),
-      imageUrl: getImageUrl(
-        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/7.png"
-      ),
+      imageUrl: getImageUrl("23.png"),
     },
   ];
 

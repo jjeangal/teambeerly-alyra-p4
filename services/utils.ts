@@ -3,7 +3,10 @@ import * as style from "@dicebear/avatars-identicon-sprites";
 
 // Use this with local IPFS Node
 // const ipfsGateway = "http://127.0.0.1:8080/ipfs";
-const ipfsGateway = "https://gateway.pinata.cloud/ipfs";
+const ipfsGateway = "https://cf-ipfs.com/ipfs";
+
+// The CID will be different for each collection
+const ipfsCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
 
 const getAvatar = function (seed: string): string {
     return createAvatar(style, {
@@ -21,7 +24,7 @@ const stripAddress = function (address: string) {
 };
 
 const getImageUrl = function (imageUrl: string): string {
-    return `${ipfsGateway}/${imageUrl}`;
+    return `${ipfsGateway}/${ipfsCID}/${imageUrl}`;
 };
 
 export { getAvatar, stripAddress, getImageUrl };
