@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getAvatar } from "../services/utils";
+import { getAvatar, getImageUrl } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
 
@@ -26,15 +26,27 @@ export default function Home() {
   const collections = [
     {
       avatar: getAvatar("lorem"),
+      imageUrl: getImageUrl(
+        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/4.png"
+      ),
     },
     {
       avatar: getAvatar("ipsum"),
+      imageUrl: getImageUrl(
+        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/5.png"
+      ),
     },
     {
       avatar: getAvatar("dolor"),
+      imageUrl: getImageUrl(
+        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/6.png"
+      ),
     },
     {
       avatar: getAvatar("amet"),
+      imageUrl: getImageUrl(
+        "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE/7.png"
+      ),
     },
   ];
 
@@ -79,7 +91,10 @@ export default function Home() {
             >
               {collections.map((collection, index) => (
                 <SwiperSlide key={index} className={styles.swiper_slide}>
-                  <CardLg avatar={collection.avatar}></CardLg>
+                  <CardLg
+                    avatar={collection.avatar}
+                    imageUrl={collection.imageUrl}
+                  ></CardLg>
                 </SwiperSlide>
               ))}
             </Swiper>

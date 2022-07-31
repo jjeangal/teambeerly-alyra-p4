@@ -1,6 +1,6 @@
-import { Avatar, Box, HStack, Image, Link } from "@chakra-ui/react";
+import { Avatar, Box, HStack, Image, Link, Skeleton } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/react";
-import { defaultItemImage } from "../../services/utils";
+import { useState } from "react";
 
 interface CardProps {
   imageUrl?: string;
@@ -8,6 +8,12 @@ interface CardProps {
 }
 
 export default function CardLg({ imageUrl, avatar }: CardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  function handleImageLoaded(): void {
+    setImageLoaded(true);
+  }
+
   return (
     <Box w="385px" bg="white" shadow="lg" rounded="lg" overflow="hidden">
       <Link>
@@ -18,7 +24,8 @@ export default function CardLg({ imageUrl, avatar }: CardProps) {
           fit="cover"
           src={imageUrl}
           alt="item"
-          fallbackSrc={defaultItemImage}
+          onLoad={handleImageLoaded}
+          fallback={<Skeleton h={"350px"} isLoaded={imageLoaded} />}
         />
       </Link>
 

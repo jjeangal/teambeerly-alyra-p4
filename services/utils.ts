@@ -1,8 +1,9 @@
 import { createAvatar } from "@dicebear/avatars";
 import * as style from "@dicebear/avatars-identicon-sprites";
 
-const defaultItemImage = `https://images.unsplash.com/photo-1613542231149-63eb74d8b4ef
-?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1972&q=80`;
+// Use this with local IPFS Node
+// const ipfsGateway = "http://127.0.0.1:8080/ipfs";
+const ipfsGateway = "https://gateway.pinata.cloud/ipfs";
 
 const getAvatar = function (seed: string): string {
     return createAvatar(style, {
@@ -19,4 +20,8 @@ const stripAddress = function (address: string) {
     return `${beginning}...${end}`;
 };
 
-export { defaultItemImage, getAvatar, stripAddress };
+const getImageUrl = function (imageUrl: string): string {
+    return `${ipfsGateway}/${imageUrl}`;
+};
+
+export { getAvatar, stripAddress, getImageUrl };
