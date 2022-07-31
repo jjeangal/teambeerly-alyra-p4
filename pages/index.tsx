@@ -77,8 +77,8 @@ export default function Home() {
               modules={[Navigation]}
               className={styles.swiper}
             >
-              {collections.map((collection) => (
-                <SwiperSlide className={styles.swiper_slide}>
+              {collections.map((collection, index) => (
+                <SwiperSlide key={index} className={styles.swiper_slide}>
                   <CardLg avatar={collection.avatar}></CardLg>
                 </SwiperSlide>
               ))}

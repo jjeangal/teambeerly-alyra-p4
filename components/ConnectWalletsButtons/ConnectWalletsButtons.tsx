@@ -59,7 +59,12 @@ export const ConnectWalletsButtons = ({ connectedEvent }: SidebarProps) => {
         >
           <Box>
             <Button colorScheme="black" variant="outline" onClick={connectMM}>
-              <Image src="/metamask-fox.svg" width={24} height={24} />
+              <Image
+                src="/metamask-fox.svg"
+                width={24}
+                height={24}
+                alt="Metamask icon"
+              />
               <Text ml={3}>Metamask</Text>
             </Button>
           </Box>
@@ -69,7 +74,12 @@ export const ConnectWalletsButtons = ({ connectedEvent }: SidebarProps) => {
               variant="outline"
               onClick={connectCoinbase}
             >
-              <Image src="/coinbase.webp" width={24} height={24} />
+              <Image
+                src="/coinbase.webp"
+                width={24}
+                height={24}
+                alt="Coinbase icon"
+              />
               <Text ml={3}>Coinbase</Text>
             </Button>
           </Box>
@@ -79,7 +89,12 @@ export const ConnectWalletsButtons = ({ connectedEvent }: SidebarProps) => {
               variant="outline"
               onClick={connectWalletConnect}
             >
-              <Image src="/wallet-connect.png" width={24} height={24} />
+              <Image
+                src="/wallet-connect.png"
+                width={24}
+                height={24}
+                alt="WalletConnect icon"
+              />
               <Text ml={3}>WalletConnect</Text>
             </Button>
           </Box>
