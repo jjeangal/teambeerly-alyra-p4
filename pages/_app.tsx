@@ -1,10 +1,11 @@
 import { AppProps } from "next/app";
-import { ThirdwebProvider, ThirdwebSDK, ChainId } from "@thirdweb-dev/react";
+import { ThirdwebProvider, ChainId } from "@thirdweb-dev/react";
+import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 import { ChakraProvider } from "@chakra-ui/react";
 import "swiper/css/bundle";
 import "../styles/globals.scss";
 import React from "react";
-import web3Handler from "../services/web3Handler";
+// import web3Handler from "../services/web3Handler";
 
 const desiredChainId = ChainId.Rinkeby;
 const sdk = new ThirdwebSDK("Rinkeby");
