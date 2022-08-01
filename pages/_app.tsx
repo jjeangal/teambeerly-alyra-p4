@@ -6,6 +6,8 @@ import "swiper/css/bundle";
 import "../styles/globals.scss";
 import React from "react";
 
+import { NFTProvider } from "../context/NFTContext.js";
+
 const desiredChainId = ChainId.Rinkeby;
 // const sdk = new ThirdwebSDK("Rinkeby");
 
@@ -18,10 +20,12 @@ export default function OpenBatch({ Component, pageProps }: AppProps) {
   // };
 
   return (
-    <ThirdwebProvider desiredChainId={desiredChainId}>
-      <ChakraProvider>
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </ThirdwebProvider>
+    <NFTProvider>
+      <ThirdwebProvider desiredChainId={desiredChainId}>
+        <ChakraProvider>
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </ThirdwebProvider>
+    </NFTProvider>
   );
 }
