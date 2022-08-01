@@ -79,6 +79,8 @@ export const NFTProvider = ({ children }) => {
     //mint NFT
     await (await nft.mint(uri)).wait();
 
+    //get ID
+    const tokenId = await nft.tokenId();
     const price = ethers.utils.parseUnits(inputPrice, "ether");
 
     const transaction = await nft.mint;
