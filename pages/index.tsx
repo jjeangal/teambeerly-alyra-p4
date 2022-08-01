@@ -21,8 +21,21 @@ import Layout from "../components/Layout/Layout";
 import { getAvatar, getImageUrl } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
+import { useContext } from "react";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
 
 export default function Home() {
+  const {
+    marketPlaceContract,
+    marketPlaceContractAsSigner,
+    erc721Contract,
+    erc721ContractAsSigner,
+  } = useContext(MarketPlaceContext);
+  console.log("marketPlaceContract", marketPlaceContract);
+  console.log("marketPlaceContractAsSigner", marketPlaceContractAsSigner);
+  console.log("erc721Contract", erc721Contract);
+  console.log("erc721ContractAsSigner", erc721ContractAsSigner);
+
   const collections = [
     {
       avatar: getAvatar("lorem"),

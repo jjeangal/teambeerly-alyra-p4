@@ -54,7 +54,7 @@ export default function CardLg({ imageUrl, avatar }: CardProps) {
             by Zoonies
           </chakra.span>
         </Box>
-        <Link href="">
+        {/* <Link>
           <Button
             colorScheme={"purple"}
             bg={"purple.800"}
@@ -63,7 +63,7 @@ export default function CardLg({ imageUrl, avatar }: CardProps) {
           >
             <a>View</a>
           </Button>
-        </Link>
+        </Link> */}
       </HStack>
     </Box>
   );
