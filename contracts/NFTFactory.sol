@@ -7,13 +7,17 @@ contract NFTFactory {
 
   event CollectionCreated(address _collectionAddress, address _owner);
   event NFTMinted(address _collectionAddress, uint256 _tokenId);
-  event No(string _name);
 
   mapping(address => BlyToken) public _collections;
   mapping(address => address) public _owners;
  
-  function createCollection(string calldata _name, string calldata _symbol, uint256 mintFee) external returns (address) {
-    BlyToken newCollection = new BlyToken( _name, _symbol);
+  function createCollection(
+    string calldata _name, 
+    string calldata _symbol, 
+    string calldata _image,
+    uint256 mintFee
+  ) external returns (address) {
+    BlyToken newCollection = new BlyToken( _name, _symbol, _image);
 
     address collectionAddress = address(newCollection);
 
@@ -45,5 +49,9 @@ contract NFTFactory {
 
   function getCollectionSymbol(address _collectionAddress) external view returns(string memory) {
     return(_collections[_collectionAddress].symbol());
+  }
+
+  function getCollectionImage(address _collectionAddress) external view returns(string memory) {
+    return(_collections[_collectionAddress].imageCid());
   }
 }

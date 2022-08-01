@@ -12,8 +12,11 @@ contract BlyToken is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     uint256 public mintFee = 0 wei; //mintfee, 0 by default.
+    string public imageCid;
 
-    constructor(string memory _name, string memory _symbol) ERC721(_name, _symbol) {}
+    constructor(string memory _name, string memory _symbol, string memory _image) ERC721(_name, _symbol) {
+        imageCid = _image;
+    }
 
     /*
     Set a mint fee.
