@@ -14,10 +14,11 @@ contract NFTFactory {
   function createCollection(
     string calldata _name, 
     string calldata _symbol, 
+    string calldata _tokenUri,
     string calldata _image,
     uint256 mintFee
   ) external returns (address) {
-    BlyToken newCollection = new BlyToken( _name, _symbol, _image);
+    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image);
 
     address collectionAddress = address(newCollection);
 
@@ -31,16 +32,12 @@ contract NFTFactory {
     return collectionAddress;
   }
 
-  function mintFromCollection(address _collectionAddress, string calldata _uri) external returns (uint256){
-    uint256 tokenId = _collections[_collectionAddress].mint(_uri);
+  function mintFromCollection(address _collectionAddress) external returns (uint256){
+    uint256 tokenId = _collections[_collectionAddress].mint();
 
     emit NFTMinted(_collectionAddress, tokenId);
     
     return(tokenId);
-  }
-
-  function getCollectionMintFee(address _collectionAddress) external view returns (uint256) {
-    return(_collections[_collectionAddress].mintFee());
   }
 
   function getCollectionName(address _collectionAddress) external view returns(string memory) {
@@ -51,7 +48,19 @@ contract NFTFactory {
     return(_collections[_collectionAddress].symbol());
   }
 
+  function getCollectionBaseUri(address _collectionAddress) external view returns(string memory) {
+    return(_collections[_collectionAddress]._baseTokenURI());
+  }
+
   function getCollectionImage(address _collectionAddress) external view returns(string memory) {
     return(_collections[_collectionAddress].imageCid());
+  }
+
+  function getCollectionMintFee(address _collectionAddress) external view returns(uint256) {
+    return(_collections[_collectionAddress].mintFee());
+  }
+
+  function getTokenUri(address _collectionAddress, uint256 _tokenId) external view returns(string memory) {
+    return(_collections[_collectionAddress].tokenURI(_tokenId));
   }
 }

@@ -7,15 +7,36 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract BlyToken is ERC721URIStorage, Ownable {
 
-    event NFTMinted(uint256 _id, string _tokenUri);
+    event NFTMinted(string _uri);
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+
     uint256 public mintFee = 0 wei; //mintfee, 0 by default.
     string public imageCid;
+    string public _baseTokenURI;
 
-    constructor(string memory _name, string memory _symbol, string memory _image) ERC721(_name, _symbol) {
+    constructor(
+        string memory _name, 
+        string memory _symbol, 
+        string memory _customTokenURI,
+        string memory _image
+        ) ERC721(_name, _symbol) {
         imageCid = _image;
+        _baseTokenURI = _customTokenURI;
+    }
+
+    function mint() external payable returns(uint256) {
+        require(msg.value == mintFee);
+        
+        uint256 currentCount = _tokenIds.current();
+        _tokenIds.increment();
+
+        _mint(msg.sender, currentCount);
+
+        emit NFTMinted(tokenURI(currentCount));
+
+        return(currentCount);
     }
 
     /*
@@ -25,17 +46,11 @@ contract BlyToken is ERC721URIStorage, Ownable {
         mintFee = _fee;
     }
 
-    function mint(string memory _tokenUri) external payable returns(uint256) {
-        require(msg.value == mintFee);
-        
-        uint256 currentCount = _tokenIds.current();
-        _tokenIds.increment();
+    function setBaseUri(string memory _customTokenURI) public onlyOwner {
+        _baseTokenURI = _customTokenURI;
+    }
 
-        _mint(msg.sender, currentCount);
-        _setTokenURI(currentCount, _tokenUri);
-
-        emit NFTMinted(currentCount, _tokenUri);
-
-        return(currentCount);
+    function _baseURI() internal view virtual override returns (string memory) {
+        return _baseTokenURI;
     }
 }

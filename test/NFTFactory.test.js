@@ -6,8 +6,41 @@ let deployer, addr1, addr2, factory, collection;
 let URI = "Test URI";
 let name = "Name";
 let symbol = "Symbol";
+let baseUri = "https://beerly.fr/";
 let imageCid = "Image Cid";
 let fee = 10;
+
+describe("Get Token Uris", function () {
+  before(async () => {
+    [deployer, addr1, addr2] = await ethers.getSigners();
+    // Get contract
+    const Factory = await ethers.getContractFactory("NFTFactory");
+    //Deploy contract
+    factory = await Factory.deploy();
+
+    const tx = await factory
+      .connect(addr1)
+      .createCollection(name, symbol, baseUri, imageCid, 0);
+    const receipt = await tx.wait();
+    const event = receipt.events.find(
+      (event) => event.event === "CollectionCreated"
+    );
+    collection = event.args._collectionAddress;
+  });
+
+  it("get correct token uri", async () => {
+    const tx = await factory.connect(addr1).mintFromCollection(collection);
+
+    const receipt = await tx.wait();
+    const event = receipt.events.find((event) => event.event === "NFTMinted");
+
+    const tokId = event.args._tokenId;
+
+    const tokUri = await factory.connect(addr1).getTokenUri(collection, tokId);
+
+    expect(tokUri).to.equal(baseUri + tokId);
+  });
+});
 
 // Tests
 describe("Correct Creation of ERC721 Collection", function () {
@@ -21,7 +54,7 @@ describe("Correct Creation of ERC721 Collection", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, imageCid, fee);
+      .createCollection(name, symbol, baseUri, imageCid, fee);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -55,6 +88,13 @@ describe("Correct Creation of ERC721 Collection", function () {
       .getCollectionImage(collection);
     expect(imageCidRes).to.equal(imageCid);
   });
+
+  it("Verify Token Base Uri", async () => {
+    const baseUriRes = await factory
+      .connect(addr1)
+      .getCollectionBaseUri(collection);
+    expect(baseUriRes).to.equal(baseUri);
+  });
 });
 
 describe("Test the creation of a ERC721 Collection with wrong values", function () {
@@ -68,7 +108,7 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
 
     const tx = await factory
       .connect(addr1)
-      .createCollection("Wname", "Wsymbol", "WCid", 0);
+      .createCollection("Wname", "Wsymbol", "WUri", "WCid", 0);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -101,5 +141,12 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
       .connect(addr1)
       .getCollectionImage(collection);
     expect(imageCidRes).to.not.equal(imageCid);
+  });
+
+  it("Verify Token Base Uri", async () => {
+    const baseUriRes = await factory
+      .connect(addr1)
+      .getCollectionBaseUri(collection);
+    expect(baseUriRes).to.not.equal(baseUri);
   });
 });
