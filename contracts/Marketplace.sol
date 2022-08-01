@@ -19,16 +19,15 @@ contract Marketplace is ReentrancyGuard {
     Counters.Counter private _tokenIds;
 
     //Struct of items listed on the marketplace
-    struct Item {
+    struct MarketItem {
         IERC721 nft;
         uint256 tokenId;
         uint256 price;
         address payable seller;
-        bool sold;
     }
 
     //Keep track of the items listed
-    mapping(uint256 => Item) public idToItem;
+    mapping(uint256 => MarketItem) public idToItem;
 
     //events at the item creation and item bought
     event MarketItemCreated(
@@ -37,7 +36,6 @@ contract Marketplace is ReentrancyGuard {
         uint256 price,
         address indexed seller
     );
-
     event MarketItemBought(
         address indexed nft,
         uint256 tokenId,
@@ -62,18 +60,18 @@ contract Marketplace is ReentrancyGuard {
         nonReentrant
     {
         require(_price > 0, "Price can't be 0");
+
         //Increment tokenId and get the current ID
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
         // transfer NFT
         _nft.transferFrom(msg.sender, address(this), newTokenId);
         //create Item on mapping and struct
-        idToItem[newTokenId] = Item(
+        idToItem[newTokenId] = MarketItem(
             _nft,
             newTokenId,
             _price,
-            payable(msg.sender),
-            false
+            payable(msg.sender)
         );
 
         emit MarketItemCreated(address(_nft), newTokenId, _price, msg.sender);
@@ -86,20 +84,26 @@ contract Marketplace is ReentrancyGuard {
             msg.value >= _totalPrice,
             "not enough ether to cover item price and market fee"
         );
-        //Get Stuct item and his ID on the market
-        Item storage item = idToItem[_itemId];
+
+        //Get struct item and his ID on the market
+        MarketItem storage item = idToItem[_itemId];
         uint256 newTokenId = _tokenIds.current();
-        //Require: if item exist or if the item is already sold
+
+        //Require: if item exist
         require(_itemId > 0 && _itemId <= newTokenId, "item doesn't exist");
-        require(!item.sold, "item already sold");
 
         // Pay seller and feeAccount
         item.seller.transfer(item.price);
         feeAccount.transfer(_totalPrice - item.price);
-        // Update item info (sold to true)
-        item.sold = true;
+
         // Transfer NFT to buyer*
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
+
+        //delete the NFT on the mapping and decrement tokenId
+        _tokenIds.decrement();
+        delete idToItem[_itemId];
+
+        //event
         emit MarketItemBought(
             address(item.nft),
             item.tokenId,
@@ -107,6 +111,48 @@ contract Marketplace is ReentrancyGuard {
             item.seller,
             msg.sender
         );
-        delete idToItem[_itemId];
+    }
+
+    // Returns all unsold market items
+    function fetchMarketItems() public view returns (MarketItem[] memory) {
+        uint256 itemCount = _tokenIds.current();
+
+        // create an array of struct MarketItem with a lenght of itemCount
+        MarketItem[] memory items = new MarketItem[](itemCount);
+
+        for (uint256 i = 0; i < itemCount; i++) {
+            // the id of the item that we're currently interracting with (+1 because it start from 1)
+            uint256 currentId = i + 1;
+            // get the mapping of the idToItem
+            MarketItem storage currentItem = idToItem[currentId];
+            // insert the market item to the items array
+            items[i] = currentItem;
+        }
+
+        return items;
+    }
+
+    // Returns only items that a user sell
+    function fetchSales(address _seller)
+        public
+        view
+        returns (MarketItem[] memory)
+    {
+        uint256 itemCount = _tokenIds.current();
+
+        // create an array of struct MarketItem with a lenght of itemCount
+        MarketItem[] memory items = new MarketItem[](itemCount);
+        for (uint256 i = 0; i < itemCount; i++) {
+            // check if nft is mine
+            if (idToItem[i + 1].seller == _seller) {
+                // get the id of the market item
+                uint256 currentId = i + 1;
+                // get the reference to the current market item
+                MarketItem storage currentItem = idToItem[currentId];
+                // insert into the array
+                items[i] = currentItem;
+            }
+        }
+        return items;
     }
 }
