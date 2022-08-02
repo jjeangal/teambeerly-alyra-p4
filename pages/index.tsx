@@ -23,7 +23,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
 import { useContext, useEffect } from "react";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
-import { useAddress } from "@thirdweb-dev/react";
 
 export default function Home() {
   const {
@@ -33,12 +32,10 @@ export default function Home() {
     erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
-  const address = useAddress();
-
   async function getFees() {
     try {
       const marketPlaceFees = await marketPlaceContract.feePercent();
-      console.log("marketPlaceFees", marketPlaceFees);
+      console.log("marketPlaceFees (Home)", marketPlaceFees);
     } catch (error) {
       console.log(error);
     }
