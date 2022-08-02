@@ -32,8 +32,8 @@ contract BlyToken is ERC721URIStorage, Ownable {
     }
 
     function mint() external payable returns(uint256) {
-        require(msg.value == _mintFee);
-        require(_tokenIds.current() < _maxSupply);
+        require(msg.value >= _mintFee, "Minting price not satisfied.");
+        require(_tokenIds.current() < _maxSupply, "Max supply already reached.");
         
         uint256 currentCount = _tokenIds.current();
         _tokenIds.increment();

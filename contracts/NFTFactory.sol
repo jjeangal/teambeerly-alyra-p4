@@ -31,7 +31,7 @@ contract NFTFactory {
     return collectionAddress;
   }
 
-  function mintFromCollection(address _collectionAddress) external returns (uint256){
+  function mintFromCollection(address _collectionAddress) external payable returns (uint256){
     uint256 tokenId = _collections[_collectionAddress].mint();
 
     emit NFTMinted(_collectionAddress, tokenId);

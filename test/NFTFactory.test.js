@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
 
 // Variables
 let deployer, addr1, addr2, factory, collection;
@@ -159,11 +160,43 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
     expect(baseUriRes).to.not.equal(baseUri);
   });
 
-  it("Verifty max supply", async () => {
+  it("Verify max supply", async () => {
     const supplyRes = await factory
       .connect(addr1)
       .getCollectionMaxSupply(collection);
 
     expect(supplyRes.toNumber()).to.not.equal(maxSupply);
   });
+});
+
+describe("Test Reverts", function () {
+  before(async () => {
+    [deployer, addr1, addr2] = await ethers.getSigners();
+    // Get contract
+    const Factory = await ethers.getContractFactory("NFTFactory");
+    //Deploy contract
+    factory = await Factory.deploy();
+
+    const tx = await factory
+      .connect(addr1)
+      .createCollection(name, symbol, baseUri, imageCid, 1, 1);
+    const receipt = await tx.wait();
+    const event = receipt.events.find(
+      (event) => event.event === "CollectionCreated"
+    );
+    collection = event.args._collectionAddress;
+  });
+
+  it("Value sent is not enough for minting fee", async () => {
+    await expectRevert(
+      factory.connect(addr1).mintFromCollection(collection),
+      "Minting price not satisfied."
+    );
+  });
+  /*
+  it("Reached max supply", async () => {
+    await expectRevert(factory.connect(addr1).mintFromCollection(collection, { value: ethers.utils.parseEther("1") }), 
+      'Max supply already reached.');
+  });
+  */
 });

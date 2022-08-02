@@ -11,6 +11,11 @@ const config: HardhatUserConfig = {
         cache: "./cache",
         tests: "./test",
     },
+    networks: {
+        hardhat: {
+            initialBaseFeePerGas: 0,
+        },
+    },
 };
 
 export default config;
