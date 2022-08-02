@@ -21,8 +21,9 @@ import Layout from "../components/Layout/Layout";
 import { getAvatar, getImageUrl } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
+import { useAddress } from "@thirdweb-dev/react";
 
 export default function Home() {
   const {
@@ -31,10 +32,24 @@ export default function Home() {
     erc721Contract,
     erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
-  console.log("marketPlaceContract", marketPlaceContract);
-  console.log("marketPlaceContractAsSigner", marketPlaceContractAsSigner);
-  console.log("erc721Contract", erc721Contract);
-  console.log("erc721ContractAsSigner", erc721ContractAsSigner);
+
+  const address = useAddress();
+
+  async function getFees() {
+    try {
+      const marketPlaceFees = await marketPlaceContract.feePercent();
+      console.log("marketPlaceFees", marketPlaceFees);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    if (marketPlaceContract) {
+      console.log(marketPlaceContract);
+      getFees();
+    }
+  }, [marketPlaceContract]);
 
   const collections = [
     {

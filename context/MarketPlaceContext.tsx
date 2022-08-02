@@ -52,41 +52,33 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
       console.error("No web3 provider found");
       return;
     }
-    const marketPlaceContract = new ethers.Contract(
+    const _marketPlaceContract = new ethers.Contract(
       marketplaceAddress,
       marketplaceAddressAbi,
       provider
     );
-    setMarketPlaceContract(marketPlaceContract);
+    setMarketPlaceContract(_marketPlaceContract);
 
-    const marketPlaceContractAsSigner = new ethers.Contract(
+    const _marketPlaceContractAsSigner = new ethers.Contract(
       marketplaceAddress,
       marketplaceAddressAbi,
       provider.getSigner()
     );
-    setMarketPlaceContractAsSigner(marketPlaceContractAsSigner);
+    setMarketPlaceContractAsSigner(_marketPlaceContractAsSigner);
 
-    const erc721Contract = new ethers.Contract(
+    const _erc721Contract = new ethers.Contract(
       erc721Address,
       erc721AddressAbi,
       provider
     );
-    setErc721Contract(erc721Contract);
+    setErc721Contract(_erc721Contract);
 
-    const erc721ContractAsSigner = new ethers.Contract(
+    const _erc721ContractAsSigner = new ethers.Contract(
       erc721Address,
       erc721AddressAbi,
       provider.getSigner()
     );
-    setErc721ContractAsSigner(erc721ContractAsSigner);
-
-    provider.on("chainChanged", () => {
-      window.location.reload();
-    });
-
-    provider.on("accountsChanged", () => {
-      window.location.reload();
-    });
+    setErc721ContractAsSigner(_erc721ContractAsSigner);
   }, []);
 
   return (

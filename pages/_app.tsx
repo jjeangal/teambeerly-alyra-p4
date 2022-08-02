@@ -5,16 +5,29 @@ import "swiper/css/bundle";
 import "../styles/globals.scss";
 import { MarketPlaceProvider } from "../context/MarketPlaceContext";
 
-const desiredChainId = ChainId.Rinkeby;
+const desiredChainId = ChainId.Hardhat;
+
+const localRPCChainId = 1337;
 
 export default function OpenBatch({ Component, pageProps }: AppProps) {
   return (
-    <MarketPlaceProvider>
-      <ThirdwebProvider desiredChainId={desiredChainId}>
+    <ThirdwebProvider
+      supportedChains={[localRPCChainId]}
+      desiredChainId={localRPCChainId}
+      chainRpc={{ [localRPCChainId]: "http://127.0.0.1:8545" }}
+      sdkOptions={{
+        gasSettings: { maxPriceInGwei: 500, speed: "fast" },
+        readonlySettings: {
+          chainId: localRPCChainId,
+          rpcUrl: "http://127.0.0.1:8545",
+        },
+      }}
+    >
+      <MarketPlaceProvider>
         <ChakraProvider>
           <Component {...pageProps} />
         </ChakraProvider>
-      </ThirdwebProvider>
-    </MarketPlaceProvider>
+      </MarketPlaceProvider>
+    </ThirdwebProvider>
   );
 }
