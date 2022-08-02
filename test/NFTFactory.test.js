@@ -8,6 +8,7 @@ let name = "Name";
 let symbol = "Symbol";
 let baseUri = "https://beerly.fr/";
 let imageCid = "Image Cid";
+let maxSupply = 50;
 let fee = 10;
 
 describe("Get Token Uris", function () {
@@ -20,7 +21,7 @@ describe("Get Token Uris", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, 0);
+      .createCollection(name, symbol, baseUri, imageCid, maxSupply, 0);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -54,20 +55,12 @@ describe("Correct Creation of ERC721 Collection", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, fee);
+      .createCollection(name, symbol, baseUri, imageCid, maxSupply, fee);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
     );
     collection = event.args._collectionAddress;
-  });
-
-  it("Verify minting fee", async () => {
-    const facFee = await factory
-      .connect(addr1)
-      .getCollectionMintFee(collection);
-
-    expect(facFee.toNumber()).to.equal(fee);
   });
 
   it("Verify Token Name", async () => {
@@ -95,6 +88,22 @@ describe("Correct Creation of ERC721 Collection", function () {
       .getCollectionBaseUri(collection);
     expect(baseUriRes).to.equal(baseUri);
   });
+
+  it("Verifty max supply", async () => {
+    const supplyRes = await factory
+      .connect(addr1)
+      .getCollectionMaxSupply(collection);
+
+    expect(supplyRes.toNumber()).to.equal(maxSupply);
+  });
+
+  it("Verify minting fee", async () => {
+    const facFee = await factory
+      .connect(addr1)
+      .getCollectionMintFee(collection);
+
+    expect(facFee.toNumber()).to.equal(fee);
+  });
 });
 
 describe("Test the creation of a ERC721 Collection with wrong values", function () {
@@ -108,7 +117,7 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
 
     const tx = await factory
       .connect(addr1)
-      .createCollection("Wname", "Wsymbol", "WUri", "WCid", 0);
+      .createCollection("Wname", "Wsymbol", "WUri", "WCid", 100, 0);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -148,5 +157,13 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
       .connect(addr1)
       .getCollectionBaseUri(collection);
     expect(baseUriRes).to.not.equal(baseUri);
+  });
+
+  it("Verifty max supply", async () => {
+    const supplyRes = await factory
+      .connect(addr1)
+      .getCollectionMaxSupply(collection);
+
+    expect(supplyRes.toNumber()).to.not.equal(maxSupply);
   });
 });

@@ -12,22 +12,28 @@ contract BlyToken is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    uint256 public mintFee = 0 wei; //mintfee, 0 by default.
-    string public imageCid;
     string public _baseTokenURI;
-
+    string public _imageCid;
+    uint256 public _maxSupply;
+    uint256 public _mintFee;
+    
     constructor(
         string memory _name, 
         string memory _symbol, 
         string memory _customTokenURI,
-        string memory _image
+        string memory _image,
+        uint256 _supply,
+        uint256 _mintingFee
         ) ERC721(_name, _symbol) {
-        imageCid = _image;
+        _maxSupply = _supply;
+        _imageCid = _image;
         _baseTokenURI = _customTokenURI;
+        _mintFee = _mintingFee;
     }
 
     function mint() external payable returns(uint256) {
-        require(msg.value == mintFee);
+        require(msg.value == _mintFee);
+        require(_tokenIds.current() < _maxSupply);
         
         uint256 currentCount = _tokenIds.current();
         _tokenIds.increment();
@@ -37,17 +43,6 @@ contract BlyToken is ERC721URIStorage, Ownable {
         emit NFTMinted(tokenURI(currentCount));
 
         return(currentCount);
-    }
-
-    /*
-    Set a mint fee.
-    */
-    function setFee(uint _fee) public onlyOwner {
-        mintFee = _fee;
-    }
-
-    function setBaseUri(string memory _customTokenURI) public onlyOwner {
-        _baseTokenURI = _customTokenURI;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {

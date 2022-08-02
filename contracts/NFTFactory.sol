@@ -16,9 +16,10 @@ contract NFTFactory {
     string calldata _symbol, 
     string calldata _tokenUri,
     string calldata _image,
-    uint256 mintFee
+    uint256 _maxSupply,
+    uint256 _mintFee
   ) external returns (address) {
-    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image);
+    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image, _maxSupply, _mintFee);
 
     address collectionAddress = address(newCollection);
 
@@ -26,8 +27,6 @@ contract NFTFactory {
     _owners[collectionAddress] = msg.sender;
 
     emit CollectionCreated(collectionAddress, msg.sender);
-
-    newCollection.setFee(mintFee);
 
     return collectionAddress;
   }
@@ -53,11 +52,15 @@ contract NFTFactory {
   }
 
   function getCollectionImage(address _collectionAddress) external view returns(string memory) {
-    return(_collections[_collectionAddress].imageCid());
+    return(_collections[_collectionAddress]._imageCid());
+  }
+
+  function getCollectionMaxSupply(address _collectionAddress) external view returns(uint256) {
+    return(_collections[_collectionAddress]._maxSupply());
   }
 
   function getCollectionMintFee(address _collectionAddress) external view returns(uint256) {
-    return(_collections[_collectionAddress].mintFee());
+    return(_collections[_collectionAddress]._mintFee());
   }
 
   function getTokenUri(address _collectionAddress, uint256 _tokenId) external view returns(string memory) {
