@@ -4,6 +4,9 @@ import Link from "next/link";
 import { FaSignOutAlt } from "react-icons/fa";
 import { getAvatar, stripAddress } from "../../services/utils";
 
+// TODO: use useNetworkMistmatch() in order to detect if
+// the connected wallet is on the correct network specified by the desiredChainId
+
 export const AccountAddress = () => {
   const address = useAddress();
   const disconnect = useDisconnect();

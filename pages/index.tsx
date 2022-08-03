@@ -18,23 +18,52 @@ import {
 import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getAvatar } from "../services/utils";
+import { getAvatar, getImageUrl } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
+import { useContext, useEffect } from "react";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
 
 export default function Home() {
+  const {
+    marketPlaceContract,
+    marketPlaceContractAsSigner,
+    erc721Contract,
+    erc721ContractAsSigner,
+  } = useContext(MarketPlaceContext);
+
+  async function getFees() {
+    try {
+      const marketPlaceFees = await marketPlaceContract.feePercent();
+      console.log("marketPlaceFees (Home)", marketPlaceFees);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    if (marketPlaceContract) {
+      console.log(marketPlaceContract);
+      getFees();
+    }
+  }, [marketPlaceContract]);
+
   const collections = [
     {
       avatar: getAvatar("lorem"),
+      imageUrl: getImageUrl("20.png"),
     },
     {
       avatar: getAvatar("ipsum"),
+      imageUrl: getImageUrl("21.png"),
     },
     {
       avatar: getAvatar("dolor"),
+      imageUrl: getImageUrl("22.png"),
     },
     {
       avatar: getAvatar("amet"),
+      imageUrl: getImageUrl("23.png"),
     },
   ];
 
@@ -79,7 +108,10 @@ export default function Home() {
             >
               {collections.map((collection, index) => (
                 <SwiperSlide key={index} className={styles.swiper_slide}>
-                  <CardLg avatar={collection.avatar}></CardLg>
+                  <CardLg
+                    avatar={collection.avatar}
+                    imageUrl={collection.imageUrl}
+                  ></CardLg>
                 </SwiperSlide>
               ))}
             </Swiper>
