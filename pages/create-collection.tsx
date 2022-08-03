@@ -71,10 +71,27 @@ export default function CreateCollection() {
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
+            <FormLabel>Symbol</FormLabel>
+            <Input type="text" />
+          </FormControl>
+        </Box>
+        <Box mt={"2em"} w={"full"}>
+          <FormControl>
             <FormLabel>Description</FormLabel>
             <FormHelperText mb={3}>
               The description will be included on the item's detail page
               underneath its image
+            </FormHelperText>
+            <Input type="text" />
+          </FormControl>
+        </Box>
+        <Box mt={"2em"} w={"full"}>
+          <FormControl>
+            <FormLabel>Base Uri</FormLabel>
+            <FormHelperText mb={3}>
+              Provide ipfs base Uri used to identify all NFTs of the collection.
+              Example: Base uri "https://ipfs.io/ipfs/QvTalyhCoX/" for token 3
+              will give "https://ipfs.io/ipfs/QvTalyhCoX/3".
             </FormHelperText>
             <Input type="text" />
           </FormControl>
@@ -94,8 +111,8 @@ export default function CreateCollection() {
           <FormControl>
             <FormLabel>Creator earnings</FormLabel>
             <FormHelperText mb={3}>
-              Earn a percentage of the sale price every time one of your items
-              is sold.
+              Define a price to be payed in order to mint an NFT from the
+              collection (ETH).
             </FormHelperText>
             <HStack maxW="full">
               <Button {...dec}>-</Button>
@@ -105,23 +122,21 @@ export default function CreateCollection() {
           </FormControl>
         </Box>
 
-        {contractType === "ERC1155" && (
-          <Box mt={"2em"} w={"full"}>
-            <FormControl>
-              <FormLabel>Supply</FormLabel>
-              <FormHelperText mb={3}>
-                In case of a ERC1155 contract you must provide a supply
-              </FormHelperText>
-              <NumberInput defaultValue={0} min={1}>
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
-            </FormControl>
-          </Box>
-        )}
+        <Box mt={"2em"} w={"full"}>
+          <FormControl>
+            <FormLabel>Supply</FormLabel>
+            <FormHelperText mb={3}>
+              You must specify the maximum amount of tokens that can be minted
+            </FormHelperText>
+            <NumberInput defaultValue={0} min={1}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </FormControl>
+        </Box>
       </Container>
     </Layout>
   );
