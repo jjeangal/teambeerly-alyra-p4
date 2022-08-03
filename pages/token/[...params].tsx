@@ -14,6 +14,8 @@ import {
   Tbody,
   Td,
   Heading,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -79,9 +81,9 @@ export default function Token() {
 
   return (
     <>
-      {tokenJson && (
-        <Layout>
-          <chakra.div p={"4em"}>
+      <Layout>
+        {tokenJson ? (
+          <chakra.span p={"4em"}>
             <HStack spacing={"2em"}>
               <Box boxSize="lg">
                 <Image
@@ -97,14 +99,12 @@ export default function Token() {
                   <Text fontSize={"20px"} fontWeight={"bold"}>
                     {tokenJson.name}
                   </Text>
-                  <Text>
+                  <chakra.span>
                     Owned by
-                    {
-                      <Text fontWeight={"bold"} display={"inline"}>
-                        {" " + stripAddress(owner)}
-                      </Text>
-                    }
-                  </Text>
+                    <Text fontWeight={"bold"} display={"inline"}>
+                      {" " + stripAddress(owner)}
+                    </Text>
+                  </chakra.span>
                   <Box mb={"20px"}>Description : {tokenJson.description}</Box>
                 </VStack>
                 <Text fontSize={"30px"} mt={"1em"} whiteSpace={"nowrap"}>
@@ -156,9 +156,13 @@ export default function Token() {
                 </TableContainer>
               </Box>
             )}
-          </chakra.div>
-        </Layout>
-      )}
+          </chakra.span>
+        ) : (
+          <Center>
+            <Spinner />
+          </Center>
+        )}
+      </Layout>
     </>
   );
 }
