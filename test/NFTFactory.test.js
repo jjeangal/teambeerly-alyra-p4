@@ -7,7 +7,7 @@ let deployer, addr1, addr2, factory, collection;
 let URI = "Test URI";
 let name = "Name";
 let symbol = "Symbol";
-let baseUri = "https://beerly.fr/";
+let baseUri = "https://ipfs.io/ipfs/QvTalyhCoX/";
 let imageCid = "Image Cid";
 let maxSupply = 50;
 let fee = 10;
@@ -179,7 +179,7 @@ describe("Test Reverts", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, 1, 1);
+      .createCollection(name, symbol, baseUri, imageCid, 0, 1);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -193,9 +193,17 @@ describe("Test Reverts", function () {
       "Minting price not satisfied."
     );
   });
-  /*
+
+  /**
   it("Reached max supply", async () => {
-    await expectRevert(factory.connect(addr1).mintFromCollection(collection, { value: ethers.utils.parseEther("1") }), 
+    const rFee = await factory
+      .connect(addr1)
+      .getCollectionMintFee(collection);
+
+    console.log(rFee);
+    console.log(ethers.utils.parseUnits("5", "wei"));
+
+    await expectRevert(factory.connect(addr1).mintFromCollection(collection, {value: ethers.utils.parseUnits("5", "wei")}), 
       'Max supply already reached.');
   });
   */
