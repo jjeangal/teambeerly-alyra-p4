@@ -80,6 +80,21 @@ export default function CreateCollection() {
     setBaseUri(e.currentTarget.value);
   };
 
+  function createCollection() {
+    if (name.length == 0) return alert("Name field is empty.");
+    if (symbol.length == 0) return alert("Symbol field is empty.");
+    if (description.length == 0) alert("Description field is empty.");
+    if (baseUri.length == 0) alert("Uri field is empty.");
+    if (supply <= 0) alert("Supply must be higher than 0.");
+    generateIpfsLinks();
+    generateMetaData();
+  }
+
+  function generateIpfsLinks() {
+    console.log("Generate folder link to IPFS");
+    console.log("Generate image link to IPFS");
+  }
+
   function generateMetaData() {
     const metadata = {
       name: name,
@@ -199,7 +214,7 @@ export default function CreateCollection() {
           bg={"purple.800"}
           color={"white"}
           variant="solid"
-          onClick={() => generateMetaData()}
+          onClick={() => createCollection()}
         >
           <a>Create</a>
         </Button>

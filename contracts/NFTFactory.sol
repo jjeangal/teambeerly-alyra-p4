@@ -2,8 +2,9 @@
 pragma solidity 0.8.14;
 
 import "./BlyToken.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract NFTFactory {
+contract NFTFactory is ReentrancyGuard {
 
   event CollectionCreated(address _collectionAddress, address _owner);
   event NFTMinted(address _collectionAddress, uint256 _tokenId);
@@ -31,7 +32,15 @@ contract NFTFactory {
     return collectionAddress;
   }
 
-  function mintFromCollection(address _collectionAddress) external payable returns (uint256){
+  function mintFromCollection(address _collectionAddress) external payable nonReentrant returns (uint256) {
+    uint256 mintFee = getCollectionMintFee(_collectionAddress);
+    require(
+      msg.value >= mintFee, 
+      "Minting price not satisfied."
+    );
+    
+    address collectionOwner = _owners[_collectionAddress];
+    payable(collectionOwner).transfer(msg.value);
     uint256 tokenId = _collections[_collectionAddress].mint();
 
     emit NFTMinted(_collectionAddress, tokenId);
@@ -59,11 +68,15 @@ contract NFTFactory {
     return(_collections[_collectionAddress]._maxSupply());
   }
 
-  function getCollectionMintFee(address _collectionAddress) external view returns(uint256) {
-    return(_collections[_collectionAddress]._mintFee());
-  }
-
   function getTokenUri(address _collectionAddress, uint256 _tokenId) external view returns(string memory) {
     return(_collections[_collectionAddress].tokenURI(_tokenId));
+  }
+
+  function getCollectionOwner(address _collectionAddress) public view returns(address) {
+    return(_owners[_collectionAddress]);
+  }
+
+  function getCollectionMintFee(address _collectionAddress) public view returns(uint256) {
+    return(_collections[_collectionAddress]._mintFee());
   }
 }

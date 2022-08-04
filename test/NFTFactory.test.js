@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
+const toWei = (num) => ethers.utils.parseEther(num.toString());
 
 // Variables
 let deployer, addr1, addr2, factory, collection;
@@ -98,6 +99,12 @@ describe("Correct Creation of ERC721 Collection", function () {
     expect(supplyRes.toNumber()).to.equal(maxSupply);
   });
 
+  it("Verify collection owner", async () => {
+    const owner = await factory.connect(addr1).getCollectionOwner(collection);
+
+    expect(addr1.address).to.equal(owner);
+  });
+
   it("Verify minting fee", async () => {
     const facFee = await factory
       .connect(addr1)
@@ -160,6 +167,12 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
     expect(baseUriRes).to.not.equal(baseUri);
   });
 
+  it("Verify collection owner", async () => {
+    const owner = await factory.connect(addr1).getCollectionOwner(collection);
+
+    expect(addr2.address).to.not.equal(owner);
+  });
+
   it("Verify max supply", async () => {
     const supplyRes = await factory
       .connect(addr1)
@@ -194,17 +207,46 @@ describe("Test Reverts", function () {
     );
   });
 
-  /**
   it("Reached max supply", async () => {
-    const rFee = await factory
-      .connect(addr1)
-      .getCollectionMintFee(collection);
+    const rFee = await factory.connect(addr1).getCollectionMintFee(collection);
 
-    console.log(rFee);
-    console.log(ethers.utils.parseUnits("5", "wei"));
-
-    await expectRevert(factory.connect(addr1).mintFromCollection(collection, {value: ethers.utils.parseUnits("5", "wei")}), 
-      'Max supply already reached.');
+    await expectRevert(
+      factory
+        .connect(addr1)
+        .mintFromCollection(collection, { value: toWei(rFee) }),
+      "Max supply already reached."
+    );
   });
-  */
+});
+
+describe("Test Events", function () {
+  before(async () => {
+    [deployer, addr1, addr2] = await ethers.getSigners();
+    // Get contract
+    const Factory = await ethers.getContractFactory("NFTFactory");
+    //Deploy contract
+    factory = await Factory.deploy();
+    const tx = await factory
+      .connect(addr1)
+      .createCollection(name, symbol, baseUri, imageCid, 1, 1);
+
+    const receipt = await tx.wait();
+    const event = receipt.events.find(
+      (event) => event.event === "CollectionCreated"
+    );
+    collection = event.args._collectionAddress;
+  });
+
+  it("NFT minted event", async () => {
+    const tx = await factory
+      .connect(addr1)
+      .mintFromCollection(collection, { value: toWei("1") });
+
+    const receipt = await tx.wait();
+    const event = receipt.events.find((event) => event.event === "NFTMinted");
+    const id = event.args._tokenId;
+    const collectionRes = event.args._collectionAddress;
+    expect(id.toNumber()).to.be.equal(0);
+    expect(collectionRes).to.be.equal(collection);
+  });
 });
