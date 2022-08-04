@@ -1,5 +1,8 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { Contract, ethers } from "ethers";
+import Web3Modal from "web3modal";
+import axios from "axios";
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 import {
   marketplaceAddress,
@@ -52,6 +55,7 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
       console.error("No web3 provider found");
       return;
     }
+
     const _marketPlaceContract = new ethers.Contract(
       marketplaceAddress,
       marketplaceAddressAbi,

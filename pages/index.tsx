@@ -87,7 +87,7 @@ export default function Home() {
               </Button>
             </Link>
 
-            <Link href="/create-collection">
+            <Link href="/create-token">
               <Button
                 colorScheme={"orange"}
                 bg={"orange.400"}
