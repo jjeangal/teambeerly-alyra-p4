@@ -90,7 +90,7 @@ export const ConnectWalletsButtons = ({ connectedEvent }: SidebarProps) => {
               onClick={connectWalletConnect}
             >
               <Image
-                src="/wallet-connect.png"
+                src="/walletconnect.png"
                 width={24}
                 height={24}
                 alt="WalletConnect icon"

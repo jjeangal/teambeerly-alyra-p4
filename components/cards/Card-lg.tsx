@@ -1,4 +1,12 @@
-import { Avatar, Box, HStack, Image, Link, Skeleton } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  HStack,
+  Image,
+  Link,
+  Skeleton,
+} from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -42,13 +50,20 @@ export default function CardLg({ imageUrl, avatar }: CardProps) {
           >
             Colorz
           </Link>
-          by&nbsp;
-          <chakra.span fontSize="sm" color="gray.700" fontWeight="bold">
-            <Link fontSize="sm" color="gray.700" fontWeight="bold">
-              Zoonies
-            </Link>
+          <chakra.span fontSize="sm" color="gray.700">
+            by Zoonies
           </chakra.span>
         </Box>
+        {/* <Link>
+          <Button
+            colorScheme={"purple"}
+            bg={"purple.800"}
+            color={"white"}
+            variant="solid"
+          >
+            <a>View</a>
+          </Button>
+        </Link> */}
       </HStack>
     </Box>
   );

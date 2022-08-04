@@ -21,8 +21,33 @@ import Layout from "../components/Layout/Layout";
 import { getAvatar, getImageUrl } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
+import { useContext, useEffect } from "react";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
 
 export default function Home() {
+  const {
+    marketPlaceContract,
+    marketPlaceContractAsSigner,
+    erc721Contract,
+    erc721ContractAsSigner,
+  } = useContext(MarketPlaceContext);
+
+  async function getFees() {
+    try {
+      const marketPlaceFees = await marketPlaceContract.feePercent();
+      console.log("marketPlaceFees (Home)", marketPlaceFees);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    if (marketPlaceContract) {
+      console.log(marketPlaceContract);
+      getFees();
+    }
+  }, [marketPlaceContract]);
+
   const collections = [
     {
       avatar: getAvatar("lorem"),
