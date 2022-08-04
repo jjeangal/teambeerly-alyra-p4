@@ -10,7 +10,7 @@ const config: HardhatUserConfig = {
     solidity: "0.8.14",
     networks: {
         hardhat: {
-            chainId: 1337,
+            chainId: 31337,
             initialBaseFeePerGas: 0,
         },
         rinkeby: {

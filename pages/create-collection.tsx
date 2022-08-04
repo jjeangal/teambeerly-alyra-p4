@@ -18,7 +18,6 @@ import {
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
-import { BaseNextRequest } from "next/dist/server/base-http";
 import React, { useContext, useEffect, useState } from "react";
 import Layout from "../components/Layout/Layout";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
@@ -64,28 +63,13 @@ export default function CreateCollection() {
   const [baseUri, setBaseUri] = useState("");
   const [supply, setSupply] = useState(0);
 
-  const handleNameChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setName(e.currentTarget.value);
-  };
-
-  const handleSymbolChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setSymbol(e.currentTarget.value);
-  };
-
-  const handleDescriptionChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setDescription(e.currentTarget.value);
-  };
-
-  const handleBaseUriChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setBaseUri(e.currentTarget.value);
-  };
-
   function createCollection() {
     if (name.length == 0) return alert("Name field is empty.");
     if (symbol.length == 0) return alert("Symbol field is empty.");
     if (description.length == 0) alert("Description field is empty.");
     if (baseUri.length == 0) alert("Uri field is empty.");
     if (supply <= 0) alert("Supply must be higher than 0.");
+
     generateIpfsLinks();
     generateMetaData();
   }
@@ -116,13 +100,21 @@ export default function CreateCollection() {
         <Box mt={"2em"} w={"full"}>
           <FormControl>
             <FormLabel>Name</FormLabel>
-            <Input type="text" value={name} onChange={handleNameChange} />
+            <Input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
             <FormLabel>Symbol</FormLabel>
-            <Input type="text" value={symbol} onChange={handleSymbolChange} />
+            <Input
+              type="text"
+              value={symbol}
+              onChange={(e) => setSymbol(e.target.value)}
+            />
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
@@ -135,7 +127,7 @@ export default function CreateCollection() {
             <Input
               type="text"
               value={description}
-              onChange={handleDescriptionChange}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </FormControl>
         </Box>
@@ -143,7 +135,7 @@ export default function CreateCollection() {
           <FormControl>
             <FormLabel>Image Url</FormLabel>
             <FormHelperText mb={3}>
-              The banner image url for a collection.
+              The banner image url for the collection.
             </FormHelperText>
             <Input
               type="text"
@@ -160,7 +152,11 @@ export default function CreateCollection() {
               Example: Base uri "https://ipfs.io/ipfs/QvTalyhCoX/" for token 3
               will give "https://ipfs.io/ipfs/QvTalyhCoX/3".
             </FormHelperText>
-            <Input type="text" value={baseUri} onChange={handleBaseUriChange} />
+            <Input
+              type="text"
+              value={baseUri}
+              onChange={(e) => setBaseUri(e.target.value)}
+            />
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
@@ -193,7 +189,7 @@ export default function CreateCollection() {
           <FormControl>
             <FormLabel>Supply</FormLabel>
             <FormHelperText mb={3}>
-              You must specify the maximum amount of tokens that can be minted
+              You must specify the maximum amount of tokens that can be minted.
             </FormHelperText>
             <NumberInput
               defaultValue={0}
