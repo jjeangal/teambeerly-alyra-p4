@@ -2,9 +2,9 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
-import fs from 'fs';
+require("dotenv").config();
 
-const privateKey1 = fs.readFileSync('.secret').toString().trim();
+const rinkebyPrivateKey = process.env.RINKEBY_PRIVATE_KEY || "";
 
 const config: HardhatUserConfig = {
     solidity: "0.8.14",
@@ -15,8 +15,8 @@ const config: HardhatUserConfig = {
         },
         rinkeby: {
             url: "https://eth-rinkeby.alchemyapi.io/v2/123abc123abc123abc123abc123abcde",
-            accounts: [privateKey1]
-        }
+            accounts: [rinkebyPrivateKey],
+        },
     },
     paths: {
         sources: "./contracts",
