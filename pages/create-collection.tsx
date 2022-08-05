@@ -60,6 +60,7 @@ export default function CreateCollection() {
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
+  const [imageFile, setImageFile] = useState<File>();
   const [baseUri, setBaseUri] = useState("");
   const [supply, setSupply] = useState(0);
 
@@ -138,9 +139,11 @@ export default function CreateCollection() {
               The banner image url for the collection.
             </FormHelperText>
             <Input
-              type="text"
-              /**value={}
-              onChange={}*/
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={(e) => {
+                if (e.target.files != null) setImageFile(e.target.files[0]);
+              }}
             />
           </FormControl>
         </Box>
