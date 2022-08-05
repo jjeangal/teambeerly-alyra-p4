@@ -83,7 +83,7 @@ export default function Home() {
                 color={"white"}
                 variant="solid"
               >
-                <a>Explore</a>
+                Explore
               </Button>
             </Link>
 
@@ -94,7 +94,7 @@ export default function Home() {
                 color={"white"}
                 variant="solid"
               >
-                <a>Create</a>
+                Create
               </Button>
             </Link>
           </HStack>
