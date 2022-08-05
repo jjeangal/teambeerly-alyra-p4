@@ -1,7 +1,7 @@
 import { useState, useContext, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useDropzone } from "react-dropzone";
-import { create as ipfsHttpsClient } from "ipfs-http-client";
+import { create } from "ipfs-http-client";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
 
 import Layout from "../components/Layout/Layout";
@@ -12,32 +12,35 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  HStack,
   Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Radio,
-  RadioGroup,
-  Stack,
   Text,
-  transform,
-  useNumberInput,
 } from "@chakra-ui/react";
-import { Contract } from "ethers";
-import { TransactionDescription } from "ethers/lib/utils";
+
+//Create IPFS clients
+const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
+const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
+const auth =
+  "Basic" + Buffer.from(projectId + ":" + projectSecret).toString("base64");
+
+const client = create({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+  headers: {
+    authorization: auth,
+  },
+});
+
+// const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
 
 export default function CreateToken() {
+  //Form input
   const [fileUrl, setFileUrl] = useState("");
   const [formInput, setFormInput] = useState({
     image: "",
     name: "",
     description: "",
   });
-  //router (to be on the main page after creating NFT)
-  const router = useRouter();
 
   //Get contracts
   const {
@@ -47,11 +50,8 @@ export default function CreateToken() {
     erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
-  //URL to stock the data on IPFS
-  const client = ipfsHttpsClient("https:/ifps.infura.io:5001/api/v0");
-
   /* Get the dropped Image */
-  // Function triggered on image drop
+  //Function triggered on image drop
   const onDrop = useCallback(async (acceptedFile) => {
     try {
       const url = await uploadToIPFS(acceptedFile[0]);
@@ -60,8 +60,6 @@ export default function CreateToken() {
     } catch (error) {
       console.log("ipfs image upload error: ", error);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {
@@ -78,48 +76,45 @@ export default function CreateToken() {
     maxSize: 5000000,
   });
 
-  const fileStyle = useMemo(() => "", []);
-
-  const createNFT = async (formInput, router) => {
-    const { image, name, description } = formInput;
-
-    // if (!name || !description || !fileUrl) return;
-    try {
-      const data = JSON.stringify({ name, description, image: fileUrl });
-      const IPFSUrl = uploadToIPFS(data);
-
-      const tokenCreation = await erc721Contract.mint(IPFSUrl);
-      await tokenCreation.wait();
-
-      router.push("/");
-    } catch (error) {
-      console.log("Error when creating NFT");
-    }
-  };
-
   const uploadToIPFS = async (file) => {
     try {
-      const added = await client.add({ content: file });
+      const added = await client.add(file);
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      return url;
     } catch (error) {
       console.log("Error when uploading file to IPFS:", error);
     }
   };
+  // const uploadToIPFS = async (event) => {
+  //   event.preventDefault()
+  //   const file = event.target.files[0]
+  //   if (typeof file !== 'undefined') {
+  //     try {
+  //       const result = await client.add(file)
+  //       console.log(result)
+  //       setFileUrl(`https://ipfs.infura.io/ipfs/${result.path}`)
+  //     } catch (error){
+  //       console.log("ipfs image upload error: ", error)
+  //     }
+  //   }
+  // }
 
-  //   // Creator earning management
-  // const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-  //   useNumberInput({
-  //     step: 0.01,
-  //     defaultValue: 0,
-  //     min: 0,
-  //     max: 25,
-  //     precision: 2,
-  //   });
-
-  // const inc = getIncrementButtonProps();
-  // const dec = getDecrementButtonProps();
-  // const input = getInputProps();
+  const createNFT = async () => {
+    const { image, name, description } = formInput;
+    if (!image || !name || !description) return;
+    try {
+      const result = await client.add(
+        JSON.stringify({ image, name, description })
+      );
+      const added = await client.add(result);
+      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      console.log("IPFS: ", url);
+      const tokenCreation = await erc721Contract.mint(url);
+      await tokenCreation.wait();
+      console.log("token created");
+    } catch (error) {
+      console.log("ipfs uri upload error: ", error);
+    }
+  };
 
   return (
     <Layout>
@@ -131,8 +126,8 @@ export default function CreateToken() {
         <Box mt={"2em"} w={"full"} {...getRootProps()}>
           <FormControl isRequired>
             <FormLabel>Image</FormLabel>
-            {/* {...getInputProps()} */}
             <Input
+              {...getInputProps()}
               onChange={(e) =>
                 setFormInput({ ...formInput, image: e.target.value })
               }
@@ -198,8 +193,9 @@ export default function CreateToken() {
             <Input type="text" />
           </FormControl>
         </Box>
-        <Box mt={"3em"} w={"full"}>
-          <Button {...createNFT(formInput, router)}>create</Button>
+        <Box mt={"3em"} w={"full"} onClick={createNFT}>
+          {/* {...createNFT()} */}
+          <Button>create</Button>
         </Box>
       </Container>
     </Layout>
