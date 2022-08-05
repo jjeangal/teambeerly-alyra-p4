@@ -3,7 +3,7 @@ import * as style from "@dicebear/avatars-identicon-sprites";
 
 // Use this with local IPFS Node
 // const ipfsGateway = "http://127.0.0.1:8080/ipfs";
-const ipfsGateway = "https://cf-ipfs.com/ipfs";
+const ipfsGateway = "https://ipfs.io/ipfs";
 
 // The CID will be different for each collection
 const ipfsCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
