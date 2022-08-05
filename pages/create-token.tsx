@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback, useMemo } from "react";
+import { useState, useContext, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDropzone } from "react-dropzone";
 import { create } from "ipfs-http-client";
@@ -20,7 +20,7 @@ import {
 const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
 const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
 const auth =
-  "Basic" + Buffer.from(projectId + ":" + projectSecret).toString("base64");
+  "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
 
 const client = create({
   host: "ipfs.infura.io",
@@ -30,8 +30,6 @@ const client = create({
     authorization: auth,
   },
 });
-
-// const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
 
 export default function CreateToken() {
   //Form input
@@ -56,7 +54,6 @@ export default function CreateToken() {
     try {
       const url = await uploadToIPFS(acceptedFile[0]);
       setFileUrl(url);
-      console.log("URL:", url);
     } catch (error) {
       console.log("ipfs image upload error: ", error);
     }
@@ -80,23 +77,11 @@ export default function CreateToken() {
     try {
       const added = await client.add(file);
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      return url;
     } catch (error) {
       console.log("Error when uploading file to IPFS:", error);
     }
   };
-  // const uploadToIPFS = async (event) => {
-  //   event.preventDefault()
-  //   const file = event.target.files[0]
-  //   if (typeof file !== 'undefined') {
-  //     try {
-  //       const result = await client.add(file)
-  //       console.log(result)
-  //       setFileUrl(`https://ipfs.infura.io/ipfs/${result.path}`)
-  //     } catch (error){
-  //       console.log("ipfs image upload error: ", error)
-  //     }
-  //   }
-  // }
 
   const createNFT = async () => {
     const { image, name, description } = formInput;
@@ -114,6 +99,11 @@ export default function CreateToken() {
     } catch (error) {
       console.log("ipfs uri upload error: ", error);
     }
+  };
+
+  const verify = () => {
+    console.log(fileUrl);
+    console.log(client);
   };
 
   return (
@@ -194,7 +184,10 @@ export default function CreateToken() {
           </FormControl>
         </Box>
         <Box mt={"3em"} w={"full"} onClick={createNFT}>
-          {/* {...createNFT()} */}
+          <Button>create</Button>
+        </Box>
+        {/* Button for dev */}
+        <Box mt={"3em"} w={"full"} onClick={verify}>
           <Button>create</Button>
         </Box>
       </Container>
