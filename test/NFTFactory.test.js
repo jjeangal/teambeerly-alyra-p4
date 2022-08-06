@@ -1,17 +1,15 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
+const { expectRevert } = require("@openzeppelin/test-helpers");
 const toWei = (num) => ethers.utils.parseEther(num.toString());
 
 // Variables
 let deployer, addr1, addr2, factory, collection;
-let URI = "Test URI";
 let name = "Name";
 let symbol = "Symbol";
 let baseUri = "https://ipfs.io/ipfs/QvTalyhCoX/";
 let imageCid = "Image Cid";
 let maxSupply = 50;
-let fee = 10;
 
 describe("Get Token Uris", function () {
   before(async () => {
@@ -21,9 +19,13 @@ describe("Get Token Uris", function () {
     //Deploy contract
     factory = await Factory.deploy();
 
-    const tx = await factory
-      .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, maxSupply, 0);
+    const tx = await factory.createCollection(
+      name,
+      symbol,
+      baseUri,
+      imageCid,
+      maxSupply
+    );
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -32,14 +34,14 @@ describe("Get Token Uris", function () {
   });
 
   it("get correct token uri", async () => {
-    const tx = await factory.connect(addr1).mintFromCollection(collection);
+    const tx = await factory.mintFromCollection(collection);
 
     const receipt = await tx.wait();
     const event = receipt.events.find((event) => event.event === "NFTMinted");
 
     const tokId = event.args._tokenId;
 
-    const tokUri = await factory.connect(addr1).getTokenUri(collection, tokId);
+    const tokUri = await factory.getTokenUri(collection, tokId);
 
     expect(tokUri).to.equal(baseUri + tokId);
   });
@@ -57,7 +59,7 @@ describe("Correct Creation of ERC721 Collection", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, maxSupply, fee);
+      .createCollection(name, symbol, baseUri, imageCid, maxSupply);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -100,17 +102,13 @@ describe("Correct Creation of ERC721 Collection", function () {
   });
 
   it("Verify collection owner", async () => {
-    const owner = await factory.connect(addr1).getCollectionOwner(collection);
+    const factoryOwner = await factory.owner();
+    expect(deployer.address).to.equal(factoryOwner);
 
-    expect(addr1.address).to.equal(owner);
-  });
+    const tx = await factory.collections(collection);
+    const owner = await factory.getCollectionOwner(tx);
 
-  it("Verify minting fee", async () => {
-    const facFee = await factory
-      .connect(addr1)
-      .getCollectionMintFee(collection);
-
-    expect(facFee.toNumber()).to.equal(fee);
+    expect(factory.address).to.equal(owner);
   });
 });
 
@@ -125,20 +123,12 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
 
     const tx = await factory
       .connect(addr1)
-      .createCollection("Wname", "Wsymbol", "WUri", "WCid", 100, 0);
+      .createCollection("Wname", "Wsymbol", "WUri", "WCid", 100);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
     );
     collection = event.args._collectionAddress;
-  });
-
-  it("Verify minting fee", async () => {
-    const facFee = await factory
-      .connect(addr1)
-      .getCollectionMintFee(collection);
-
-    expect(facFee.toNumber()).to.not.equal(fee);
   });
 
   it("Verify Token Name", async () => {
@@ -169,7 +159,6 @@ describe("Test the creation of a ERC721 Collection with wrong values", function 
 
   it("Verify collection owner", async () => {
     const owner = await factory.connect(addr1).getCollectionOwner(collection);
-
     expect(addr2.address).to.not.equal(owner);
   });
 
@@ -192,7 +181,7 @@ describe("Test Reverts", function () {
 
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, 0, 1);
+      .createCollection(name, symbol, baseUri, imageCid, 0);
     const receipt = await tx.wait();
     const event = receipt.events.find(
       (event) => event.event === "CollectionCreated"
@@ -200,20 +189,9 @@ describe("Test Reverts", function () {
     collection = event.args._collectionAddress;
   });
 
-  it("Value sent is not enough for minting fee", async () => {
-    await expectRevert(
-      factory.connect(addr1).mintFromCollection(collection),
-      "Minting price not satisfied."
-    );
-  });
-
   it("Reached max supply", async () => {
-    const rFee = await factory.connect(addr1).getCollectionMintFee(collection);
-
     await expectRevert(
-      factory
-        .connect(addr1)
-        .mintFromCollection(collection, { value: toWei(rFee) }),
+      factory.mintFromCollection(collection),
       "Max supply already reached."
     );
   });
@@ -228,7 +206,7 @@ describe("Test Events", function () {
     factory = await Factory.deploy();
     const tx = await factory
       .connect(addr1)
-      .createCollection(name, symbol, baseUri, imageCid, 1, 1);
+      .createCollection(name, symbol, baseUri, imageCid, 1);
 
     const receipt = await tx.wait();
     const event = receipt.events.find(
@@ -238,9 +216,7 @@ describe("Test Events", function () {
   });
 
   it("NFT minted event", async () => {
-    const tx = await factory
-      .connect(addr1)
-      .mintFromCollection(collection, { value: toWei("1") });
+    const tx = await factory.mintFromCollection(collection);
 
     const receipt = await tx.wait();
     const event = receipt.events.find((event) => event.event === "NFTMinted");

@@ -2,11 +2,12 @@
 pragma solidity 0.8.14;
 
 import "./BlyToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /// @title Factory ERC721 Contract 
 /// @author Team Beerly
-contract NFTFactory is ReentrancyGuard {
+contract NFTFactory is ReentrancyGuard, Ownable {
 
   event CollectionCreated(address _collectionAddress, address _owner);
   event NFTMinted(address _collectionAddress, uint256 _tokenId);
@@ -14,7 +15,7 @@ contract NFTFactory is ReentrancyGuard {
   /// Maps the collection addresses to the collection contracts
   mapping(address => BlyToken) public collections;
   /// Maps the collection addresses to the contract owner addresses 
-  mapping(address => address) public owners;
+  mapping(address => address[]) public ownerToCollections;
  
   /// Create a new collection
   /// @notice Adds the owner and collection address to a mapping
@@ -24,18 +25,16 @@ contract NFTFactory is ReentrancyGuard {
     string calldata _symbol, 
     string calldata _tokenUri,
     string calldata _image,
-    uint256 _maxSupply,
-    uint256 _mintFee
+    uint256 _maxSupply
   ) external returns (address) {
-    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image, _maxSupply, _mintFee);
+    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image, _maxSupply);
 
     address collectionAddress = address(newCollection);
 
     collections[collectionAddress] = newCollection;
-    owners[collectionAddress] = msg.sender;
+    ownerToCollections[msg.sender].push(collectionAddress);
 
     emit CollectionCreated(collectionAddress, msg.sender);
-
     return collectionAddress;
   }
 
@@ -44,20 +43,16 @@ contract NFTFactory is ReentrancyGuard {
   /// @notice Owner gets transfered the minting fee amount
   /// @param _collectionAddress The address of the collection
   /// @return The id of the minted token
-  function mintFromCollection(address _collectionAddress) external payable nonReentrant returns (uint256) {
-    uint256 mintFee = getCollectionMintFee(_collectionAddress);
-    require(
-      msg.value >= mintFee, 
-      "Minting price not satisfied."
-    );
-    
-    address collectionOwner = owners[_collectionAddress];
-    payable(collectionOwner).transfer(msg.value);
+  function mintFromCollection(address _collectionAddress) external payable onlyOwner nonReentrant returns (uint256) {
     uint256 tokenId = collections[_collectionAddress].mint();
-
     emit NFTMinted(_collectionAddress, tokenId);
-    
     return(tokenId);
+  }
+
+  /// @notice Returns the addresses of the collections owned by an address
+  /// @param _ownerAddress The address of the owner
+  function getCollectionsOfOwner(address _ownerAddress) external view returns(address[] memory) {
+    return(ownerToCollections[_ownerAddress]);
   }
 
   /// @notice Returns the name of a collection
@@ -97,15 +92,9 @@ contract NFTFactory is ReentrancyGuard {
     return(collections[_collectionAddress].tokenURI(_tokenId));
   }
 
-  /// @notice Returns the minting fee of a collection's token
-  /// @param _collectionAddress The address of the collection
-  function getCollectionMintFee(address _collectionAddress) public view returns(uint256) {
-    return(collections[_collectionAddress].mintFee());
-  }
-
   /// @notice Returns the owner of a collection
   /// @param _collectionAddress The address of the collection
   function getCollectionOwner(address _collectionAddress) public view returns(address) {
-    return(owners[_collectionAddress]);
+    return(collections[_collectionAddress].owner());
   }
 }
