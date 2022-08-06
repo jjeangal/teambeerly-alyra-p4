@@ -29,19 +29,24 @@ const uploadFileToIPFS = async (file: any): Promise<any> => {
     }
 };
 
-const uploadFolderToIPFS = async (files: any) => {
+const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
     console.log(
         "🔎 ~ file: ipfs.service.ts ~ line 65 ~ uploadFolderToIPFS ~ files",
         files
     );
 
-    const filesToUpload = [];
+    let filesToUpload;
 
-    for (const fileIndex in Array.from(files)) {
-        filesToUpload.push({
-            path: files[fileIndex].name,
-            content: files[fileIndex],
-        });
+    if (isBuffer) {
+        filesToUpload = files;
+    } else {
+        filesToUpload = [];
+        for (const fileIndex in Array.from(files)) {
+            filesToUpload.push({
+                path: files[fileIndex].name,
+                content: files[fileIndex],
+            });
+        }
     }
 
     try {

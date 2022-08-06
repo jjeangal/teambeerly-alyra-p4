@@ -79,23 +79,31 @@ export default function CreateCollection() {
       itemsMetadatas
     );
 
-    await uploadFolderToIPFS(itemsMetadatas);
+    // await uploadFolderToIPFS(itemsMetadatas);
 
     const jsonFileCollection = new File(
       [JSON.stringify(collectionMetadata)],
       `_metadata.json`,
-      { type: "multipart/form-data" }
+      { type: "application/json" }
     );
 
-    let filesList: any = { "0": jsonFileCollection };
+    let filesList: any = [
+      {
+        path: `_metadata.json`,
+        content: jsonFileCollection,
+      },
+    ];
 
     itemsMetadatas.forEach(async (itemsMetadata, index) => {
       const jsonFileItem = new File(
         [JSON.stringify(itemsMetadata)],
         `${index}.json`,
-        { type: "multipart/form-data" }
+        { type: "application/json" }
       );
-      filesList[index] = jsonFileItem;
+      filesList[index + 1] = {
+        path: `${index}.json`,
+        content: jsonFileItem,
+      };
     });
 
     const cidJson = await uploadAllMetadata(filesList);
@@ -106,7 +114,7 @@ export default function CreateCollection() {
   };
 
   const uploadAllMetadata = async (itemsMetadatas: any[]) => {
-    await uploadFolderToIPFS(itemsMetadatas);
+    await uploadFolderToIPFS(itemsMetadatas, true);
   };
 
   const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
