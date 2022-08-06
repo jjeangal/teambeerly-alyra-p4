@@ -8,6 +8,7 @@ import Layout from "../components/Layout/Layout";
 import {
   Box,
   Button,
+  HStack,
   Container,
   FormControl,
   FormHelperText,
@@ -39,6 +40,8 @@ export default function CreateToken() {
     name: "",
     description: "",
   });
+
+  let ipfsUrlc;
 
   //Get contracts
   const {
@@ -76,7 +79,7 @@ export default function CreateToken() {
   const uploadToIPFS = async (file) => {
     try {
       const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
+      const url = `https://openbatch.infura-ipfs.io/ipfs/${added.path}`;
       return url;
     } catch (error) {
       console.log("Error when uploading file to IPFS:", error);
@@ -115,9 +118,8 @@ export default function CreateToken() {
         {/* Need to change this to an upload image form */}
         <Box mt={"2em"} w={"full"} {...getRootProps()}>
           <FormControl isRequired>
-            <FormLabel>Image</FormLabel>
+            <FormLabel>Click here to upload an Image</FormLabel>
             <Input
-              {...getInputProps()}
               onChange={(e) =>
                 setFormInput({ ...formInput, image: e.target.value })
               }

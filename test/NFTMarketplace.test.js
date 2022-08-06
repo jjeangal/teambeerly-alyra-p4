@@ -59,26 +59,24 @@ describe("NFT", function () {
     it("Should not be reverted", async () => {
       //Should track newly created item
       await expect(
-        marketplace.connect(addr1).makeItem(nft.address, 1, toWei(1))
+        marketplace.connect(addr1).createMarketItem(nft.address, toWei(1))
       )
         .to.emit(marketplace, "Offered")
         .withArgs(1, nft.address, 1, toWei(1), addr1.address);
 
       //Should trasnfer NFT from seller to marketplace
       expect(await nft.ownerOf(1)).to.equal(marketplace.address);
-      expect(await marketplace.itemCount()).to.equal(1);
+      expect(await marketplace._tokenIds()).to.equal(1);
 
       //Should store the NFT in the struct Item with the right values
       const item = await marketplace.items(1);
-      expect(item.itemId).to.equal(1);
       expect(item.nft).to.equal(nft.address);
       expect(item.tokenId).to.equal(1);
       expect(item.price).to.equal(toWei(1));
-      expect(item.sold).to.equal(false);
     });
     it("Should fail with price set to zero", async () => {
       await expect(
-        marketplace.connect(addr1).makeItem(nft.address, 1, 0)
+        marketplace.connect(addr1).createMarketItem(nft.address, 0)
       ).to.be.revertedWith("Price can't be 0");
     });
   });
@@ -94,7 +92,7 @@ describe("NFT", function () {
       // addr1 approves marketplace to get NFT
       await nft.connect(addr1).setApprovalForAll(marketplace.address, true);
       // addr1 makes their nft a marketplace item
-      await marketplace.connect(addr1).makeItem(nft.address, 1, toWei(1));
+      await marketplace.connect(addr1).createMarketItem(nft.address, toWei(1));
     });
 
     it("Should update item as sold, pay seller, transfer NFT to buyer, charge fees and emit a Bought event", async () => {
