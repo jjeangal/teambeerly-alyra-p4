@@ -15,6 +15,7 @@ import {
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
+import { any, json } from "hardhat/internal/core/params/argumentTypes";
 import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import {
@@ -48,6 +49,33 @@ export default function CreateCollection() {
   const dec = getDecrementButtonProps();
   const input = getInputProps();
 
+  async function createCollection() {
+    if (name.length == 0) return alert("Name field is empty.");
+    if (symbol.length == 0) return alert("Symbol field is empty.");
+    if (description.length == 0) return alert("Description field is empty.");
+    if (!imageFile) return alert("Choose a collection image.");
+    if (!uriFolder) return alert("Choose images for collection nfts.");
+    if (supply <= 0) return alert("Supply must be higher than 0.");
+
+    // const tokenMetadatas = [{}];
+    // 1) création du dossier d'images, avec les images dedans dans IPFS
+    // 2) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
+    // 3) création du metadata de chaque item, avec push sur IPFS
+    // 4) création des interactions avec le contracts
+
+    await generateIPFSLinks();
+    const metadatas = generateMetaData([]);
+    console.log(metadatas);
+    await uploadMetaDataIPFS(metadatas);
+  }
+
+  async function generateIPFSLinks() {
+    console.log("Generate image link to IPFS:");
+    if (imageFile) getImageIPFSUrl(imageFile);
+    console.log("Generate folder link to IPFS");
+    const lastUri = await getUriIPFS(uriFolder);
+  }
+
   const getImageIPFSUrl = async (acceptedFile: File) => {
     try {
       const url: string = await uploadFileToIPFS(acceptedFile);
@@ -61,45 +89,39 @@ export default function CreateCollection() {
   const getUriIPFS = async (acceptedFile: FileList) => {
     try {
       const url = await uploadFolderToIPFS(acceptedFile);
-      console.log(url);
-      if (url) setBaseUri(url);
+      const lastBaseUri = url[url.length - 1].cid;
+      return lastBaseUri;
     } catch (error) {
       console.log("ipfs image upload error: ", error);
     }
   };
 
-  async function createCollection() {
-    if (name.length == 0) return alert("Name field is empty.");
-    if (symbol.length == 0) return alert("Symbol field is empty.");
-    if (description.length == 0) return alert("Description field is empty.");
-    if (!imageFile) return alert("Choose a collection image.");
-    if (!uriFolder) return alert("Choose images for collection nfts.");
-    if (supply <= 0) return alert("Supply must be higher than 0.");
+  function generateItemMetadata() {}
 
-    // 1) création du dossier d'images, avec les images dedans dans IPFS
-    // 2) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
-    // 3) création du metadata de chaque item, avec push sur IPFS
-    // 4) création des interactions avec le contracts
+  function generateMetaData(acceptedFile: FileList, uri: string) {
+    const filesMetadata = [];
+    for (let i = 0; i < acceptedFile.length; i++) {
+      let file = acceptedFile.item(i);
+      const metadata = {
+        name: name + " #" + i,
+        description:
+          "Welcome to the home of " +
+          name +
+          " on OpenBatch. Discover the best items in this collection.",
+        image: uri + "/" + file.name,
+        date: new Date().toJSON(),
+      };
+      filesMetadata.push(metadata);
+    }
 
-    await generateIPFSLinks();
-    const metadatas = generateMetaData();
-    console.log(metadatas);
-    await uploadMetaDataIPFS(metadatas);
-  }
-
-  async function generateIPFSLinks() {
-    console.log("Generate folder link to IPFS");
-    if (uriFolder) getUriIPFS(uriFolder);
-    console.log("Generate image link to IPFS:");
-    if (imageFile) getImageIPFSUrl(imageFile);
-  }
-
-  function generateMetaData() {
     return {
-      name: name,
-      description: description,
-      image: imageUrl,
-      external_url: baseUri,
+      collection: {
+        name: name,
+        description: description,
+        image: imageUrl,
+        external_url: baseUri,
+      },
+      items: items,
     };
   }
 
