@@ -12,7 +12,6 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  chakra,
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
@@ -60,7 +59,6 @@ export default function CreateCollection() {
   };
 
   const getUriIPFS = async (acceptedFile: FileList) => {
-    // const collectionFolderName = name
     try {
       const url = await uploadFolderToIPFS(acceptedFile);
       console.log(url);
@@ -77,6 +75,12 @@ export default function CreateCollection() {
     if (!imageFile) return alert("Choose a collection image.");
     if (!uriFolder) return alert("Choose images for collection nfts.");
     if (supply <= 0) return alert("Supply must be higher than 0.");
+
+    // 1) création du dossier d'images, avec les images dedans dans IPFS
+    // 2) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
+    // 3) création du metadata de chaque item, avec push sur IPFS
+    // 4) création des interactions avec le contracts
+
     await generateIPFSLinks();
     const metadatas = generateMetaData();
     console.log(metadatas);
