@@ -29,22 +29,6 @@ const uploadFileToIPFS = async (file: any): Promise<any> => {
     }
 };
 
-const uploadMetaDataIPFS = async (json: any): Promise<any> => {
-    try {
-        return await fetch(`http://${infuraUrl}:${infuraPort}/api/v0/add`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: auth,
-            },
-            body: JSON.stringify(json),
-        });
-    } catch (error) {
-        console.log("Error when uploading file (json) to IPFS:", error);
-        return Promise.reject(error);
-    }
-};
-
 const uploadFolderToIPFS = async (files: any) => {
     console.log(
         "🔎 ~ file: ipfs.service.ts ~ line 65 ~ uploadFolderToIPFS ~ files",
@@ -103,10 +87,4 @@ const getToken = async (params: any): Promise<any> => {
     }
 };
 
-export {
-    getIPFSImageUrl,
-    uploadMetaDataIPFS,
-    uploadFileToIPFS,
-    uploadFolderToIPFS,
-    getToken,
-};
+export { getIPFSImageUrl, uploadFileToIPFS, uploadFolderToIPFS, getToken };

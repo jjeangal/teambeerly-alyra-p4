@@ -15,13 +15,12 @@ import {
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
-import { any, json } from "hardhat/internal/core/params/argumentTypes";
 import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import {
+  ipfsGateway,
   uploadFileToIPFS,
   uploadFolderToIPFS,
-  uploadMetaDataIPFS,
 } from "../services/ipfs.service";
 
 export default function CreateCollection() {
@@ -58,29 +57,63 @@ export default function CreateCollection() {
     if (supply <= 0) return alert("Supply must be higher than 0.");
 
     // const tokenMetadatas = [{}];
-    // 1) création du dossier d'images, avec les images dedans dans IPFS
-    // 2) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
-    // 3) création du metadata de chaque item, avec push sur IPFS
+    // 1) création du dossier d'images, avec les images dedans dans IPFS => OK
+    // 2) création du metadata de chaque item, avec push sur IPFS
+    // 3) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
     // 4) création des interactions avec le contracts
 
-    await generateIPFSLinks();
-    const metadatas = generateMetaData([]);
-    console.log(metadatas);
-    await uploadMetaDataIPFS(metadatas);
+    await generateIPFSLinks(imageFile, uriFolder);
+    // const metadatas = generateMetaData([]);
+    // console.log(metadatas);
+    // await uploadMetaDataIPFS(metadatas);
   }
 
-  async function generateIPFSLinks() {
-    console.log("Generate image link to IPFS:");
-    if (imageFile) getImageIPFSUrl(imageFile);
-    console.log("Generate folder link to IPFS");
-    const lastUri = await getUriIPFS(uriFolder);
-  }
+  const generateIPFSLinks = async (imageFile: File, imagesFolder: FileList) => {
+    const urlBannerImage = await getImageIPFSUrl(imageFile);
+    const cidFolder: any = await getUriIPFS(imagesFolder);
 
-  const getImageIPFSUrl = async (acceptedFile: File) => {
+    const itemsMetadatas = await generateItemsMetadata(imagesFolder, cidFolder);
+    const collectionMetadata = await generateCollectionMetadata(
+      urlBannerImage,
+      cidFolder,
+      itemsMetadatas
+    );
+
+    await uploadFolderToIPFS(itemsMetadatas);
+
+    const jsonFileCollection = new File(
+      [JSON.stringify(collectionMetadata)],
+      `_metadata.json`,
+      { type: "multipart/form-data" }
+    );
+
+    let filesList: any = { "0": jsonFileCollection };
+
+    itemsMetadatas.forEach(async (itemsMetadata, index) => {
+      const jsonFileItem = new File(
+        [JSON.stringify(itemsMetadata)],
+        `${index}.json`,
+        { type: "multipart/form-data" }
+      );
+      filesList[index] = jsonFileItem;
+    });
+
+    const cidJson = await uploadAllMetadata(filesList);
+    console.log(
+      "🔎 ~ file: create-collection.tsx ~ line 92 ~ generateIPFSLinks ~ urlAllJson",
+      cidJson
+    );
+  };
+
+  const uploadAllMetadata = async (itemsMetadatas: any[]) => {
+    await uploadFolderToIPFS(itemsMetadatas);
+  };
+
+  const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
     try {
       const url: string = await uploadFileToIPFS(acceptedFile);
       console.log(url);
-      if (url) setImageUrl(url);
+      return Promise.resolve(url);
     } catch (error) {
       console.log("ipfs image upload error: ", error);
     }
@@ -88,7 +121,7 @@ export default function CreateCollection() {
 
   const getUriIPFS = async (acceptedFile: FileList) => {
     try {
-      const url = await uploadFolderToIPFS(acceptedFile);
+      const url: any = await uploadFolderToIPFS(acceptedFile);
       const lastBaseUri = url[url.length - 1].cid;
       return lastBaseUri;
     } catch (error) {
@@ -96,34 +129,41 @@ export default function CreateCollection() {
     }
   };
 
-  function generateItemMetadata() {}
-
-  function generateMetaData(acceptedFile: FileList, uri: string) {
+  const generateItemsMetadata = async (
+    acceptedFile: FileList,
+    cidFolder: string
+  ) => {
     const filesMetadata = [];
     for (let i = 0; i < acceptedFile.length; i++) {
-      let file = acceptedFile.item(i);
+      let file: any = acceptedFile.item(i);
+
       const metadata = {
-        name: name + " #" + i,
-        description:
-          "Welcome to the home of " +
-          name +
-          " on OpenBatch. Discover the best items in this collection.",
-        image: uri + "/" + file.name,
+        name: `${name} #${i}`,
+        description: `Welcome to the home of ${name} on OpenBatch. Discover the best items in this collection.`,
+        image: `${ipfsGateway}/${cidFolder}/${file.name}`,
         date: new Date().toJSON(),
       };
+
       filesMetadata.push(metadata);
     }
 
-    return {
-      collection: {
-        name: name,
-        description: description,
-        image: imageUrl,
-        external_url: baseUri,
-      },
-      items: items,
+    return filesMetadata;
+  };
+
+  const generateCollectionMetadata = async (
+    urlBannerImage: string,
+    cidFolder: string,
+    itemsMetadatas: any[]
+  ) => {
+    const result = {
+      name,
+      description,
+      image: urlBannerImage,
+      external_url: `${ipfsGateway}/${cidFolder}`,
+      items: itemsMetadatas,
     };
-  }
+    return result;
+  };
 
   return (
     <Layout>
