@@ -6,9 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract BlyToken is ERC721URIStorage, Ownable {
-
-    event NFTMinted(string _uri);
-
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -32,15 +29,12 @@ contract BlyToken is ERC721URIStorage, Ownable {
     }
 
     function mint() external payable returns(uint256) {
-        require(msg.value >= _mintFee, "Minting price not satisfied.");
         require(_tokenIds.current() < _maxSupply, "Max supply already reached.");
         
         uint256 currentCount = _tokenIds.current();
         _tokenIds.increment();
 
         _mint(msg.sender, currentCount);
-
-        emit NFTMinted(tokenURI(currentCount));
 
         return(currentCount);
     }
