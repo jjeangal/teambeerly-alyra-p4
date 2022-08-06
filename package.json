@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "start:h": "hardhat node",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy:rinkeby": "hardhat run scripts/deploy.ts --network rinkeby",
     "prettier": "npx prettier --write .",

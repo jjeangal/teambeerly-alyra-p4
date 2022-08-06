@@ -12,19 +12,20 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Radio,
-  RadioGroup,
-  Stack,
+  chakra,
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
-import { create } from "ipfs-http-client";
+import {
+  uploadFileToIPFS,
+  uploadFolderToIPFS,
+  uploadMetaDataIPFS,
+} from "../services/ipfs.service";
 
 export default function CreateCollection() {
   // Contract type management
-  const [contractType, setContractType] = useState("ERC721");
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
@@ -48,45 +49,9 @@ export default function CreateCollection() {
   const dec = getDecrementButtonProps();
   const input = getInputProps();
 
-  //Create IPFS clients
-  const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
-  const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
-  const auth =
-    "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-
-  const client = create({
-    host: "ipfs.infura.io",
-    port: 5001,
-    protocol: "https",
-    headers: {
-      authorization: auth,
-    },
-  });
-
-  const uploadFileToIPFS = async (file: any) => {
+  const getImageIPFSUrl = async (acceptedFile: File) => {
     try {
-      const added = await client.add(file);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      return url;
-    } catch (error) {
-      console.log("Error when uploading file to IPFS:", error);
-    }
-  };
-
-  const uploadFolderToIPFS = async (file: any) => {
-    try {
-      //const added = await client.addAll(file);
-      //console.log("added: " + added)
-      //const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      return null;
-    } catch (error) {
-      console.log("Error when uploading file to IPFS:", error);
-    }
-  };
-
-  const getImageIpfsUrl = async (acceptedFile: File) => {
-    try {
-      const url = await uploadFileToIPFS(acceptedFile);
+      const url: string = await uploadFileToIPFS(acceptedFile);
       console.log(url);
       if (url) setImageUrl(url);
     } catch (error) {
@@ -94,7 +59,8 @@ export default function CreateCollection() {
     }
   };
 
-  const getUriIpfs = async (acceptedFile: FileList) => {
+  const getUriIPFS = async (acceptedFile: FileList) => {
+    // const collectionFolderName = name
     try {
       const url = await uploadFolderToIPFS(acceptedFile);
       console.log(url);
@@ -104,33 +70,33 @@ export default function CreateCollection() {
     }
   };
 
-  function createCollection() {
+  async function createCollection() {
     if (name.length == 0) return alert("Name field is empty.");
     if (symbol.length == 0) return alert("Symbol field is empty.");
     if (description.length == 0) return alert("Description field is empty.");
     if (!imageFile) return alert("Choose a collection image.");
     if (!uriFolder) return alert("Choose images for collection nfts.");
     if (supply <= 0) return alert("Supply must be higher than 0.");
-    generateIpfsLinks();
-    generateMetaData();
+    await generateIPFSLinks();
+    const metadatas = generateMetaData();
+    console.log(metadatas);
+    await uploadMetaDataIPFS(metadatas);
   }
 
-  function generateIpfsLinks() {
+  async function generateIPFSLinks() {
     console.log("Generate folder link to IPFS");
-    if (uriFolder) getUriIpfs(uriFolder);
+    if (uriFolder) getUriIPFS(uriFolder);
     console.log("Generate image link to IPFS:");
-    if (imageFile) getImageIpfsUrl(imageFile);
+    if (imageFile) getImageIPFSUrl(imageFile);
   }
 
   function generateMetaData() {
-    const metadata = {
+    return {
       name: name,
       description: description,
       image: imageUrl,
       external_url: baseUri,
     };
-    console.log(metadata);
-    return metadata;
   }
 
   return (
@@ -190,31 +156,20 @@ export default function CreateCollection() {
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Base Uri</FormLabel>
+            <FormLabel>Images Folder</FormLabel>
             <FormHelperText mb={3}>
-              Provide ipfs base Uri used to identify all NFTs of the collection.
-              Example: Base uri "https://ipfs.io/ipfs/QvTalyhCoX/" for token 3
-              will give "https://ipfs.io/ipfs/QvTalyhCoX/3".
+              Choose the folder for all the images. Please be sure that all
+              files are named like follow : "X.[file_extension]" with X a number
+              started to 0
             </FormHelperText>
             <Input
               type="file"
-              accept="image/png, image/jpeg"
-              multiple={true}
+              name="folderPicker"
+              webkitdirectory={"true"}
               onChange={(e) => {
                 if (e.target.files != null) setUriFolder(e.target.files);
               }}
             />
-          </FormControl>
-        </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Type</FormLabel>
-            <RadioGroup onChange={setContractType} value={contractType}>
-              <Stack direction="row">
-                <Radio value="ERC721">ERC721</Radio>
-                <Radio value="ERC1155">ERC1155</Radio>
-              </Stack>
-            </RadioGroup>
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
@@ -241,7 +196,7 @@ export default function CreateCollection() {
               defaultValue={0}
               min={1}
               value={supply}
-              onChange={(num) => setSupply(parseInt(num))}
+              onChange={(num) => setSupply(parseInt(num, 10))}
             >
               <NumberInputField />
               <NumberInputStepper>

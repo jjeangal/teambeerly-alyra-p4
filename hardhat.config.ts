@@ -2,7 +2,13 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomiclabs/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
-require("dotenv").config();
+
+const pathEnv =
+    process.env.NODE_ENV === "production"
+        ? "./.env.production"
+        : "./.env.local";
+
+require("dotenv").config({ path: pathEnv });
 
 const rinkebyPrivateKey = process.env.RINKEBY_PRIVATE_KEY || "";
 

@@ -20,7 +20,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getAvatar, getImageUrl } from "../services/utils";
+import { getIPFSImageUrl } from "../services/ipfs.service";
+import { getAvatar } from "../services/utils";
 
 export default function Profile() {
   const address = useAddress() || "";
@@ -28,18 +29,20 @@ export default function Profile() {
   const [balance, setBalance] = useState("");
   const { hasCopied, onCopy } = useClipboard(address);
 
+  const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
+
   const userCollections = [
     {
-      imageUrl: getImageUrl("5.png"),
+      imageUrl: getIPFSImageUrl(testCID, "5.png"),
     },
     {
-      imageUrl: getImageUrl("15.png"),
+      imageUrl: getIPFSImageUrl(testCID, "6.png"),
     },
     {
-      imageUrl: getImageUrl("20.png"),
+      imageUrl: getIPFSImageUrl(testCID, "7.png"),
     },
     {
-      imageUrl: getImageUrl("8.png"),
+      imageUrl: getIPFSImageUrl(testCID, "8.png"),
     },
   ];
 

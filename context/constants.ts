@@ -12,6 +12,9 @@ export const marketplaceAddressAbi = marketplaceJSon.abi;
 
 export const networkCurrency = "ETH";
 
+export const infuraUrl = "ipfs.infura.io";
+export const infuraPort = 5001;
+
 export const prodChainId = ChainId.Rinkeby;
 export const localChainId = ChainId.Hardhat;
 export const localRpcCUrl = "http://127.0.0.1:8545";
