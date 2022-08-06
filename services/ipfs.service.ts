@@ -1,7 +1,7 @@
 import { infuraPort, infuraUrl } from "../context/constants";
-import { create, IPFSHTTPClient } from "ipfs-http-client";
+import { create } from "ipfs-http-client";
 
-const ipfsGateway = "https://ipfs.io/ipfs";
+export const ipfsGateway = "https://ipfs.io/ipfs";
 const ipfsInfura = "https://ipfs.infura.io/ipfs";
 
 // Create IPFS clients
@@ -84,9 +84,29 @@ const getIPFSImageUrl = (collectionCID: string, imageUrl?: string): string => {
     return `${ipfsGateway}/${collectionCID}${_imageUrl}`;
 };
 
+const getToken = async (params: any): Promise<any> => {
+    const collectionCIDJson = params[0];
+    const tokenId = params[1];
+    try {
+        const fetchResponse = await fetch(
+            `${ipfsGateway}/${collectionCIDJson}/${tokenId}.json`
+        );
+        if (fetchResponse.ok) {
+            const tokenMetaData = await fetchResponse.json();
+            return Promise.resolve(tokenMetaData);
+        } else {
+            alert("HTTP-Error: " + fetchResponse.status);
+        }
+    } catch (error) {
+        console.log("Error when fetching token metadata : ", error);
+        return Promise.reject(error);
+    }
+};
+
 export {
     getIPFSImageUrl,
     uploadMetaDataIPFS,
     uploadFileToIPFS,
     uploadFolderToIPFS,
+    getToken,
 };

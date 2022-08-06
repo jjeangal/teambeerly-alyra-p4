@@ -33,8 +33,8 @@ export default function Header() {
         >
           <Flex w="full" h="full" px="6" align="center" justify="space-between">
             <Flex align="center">
-              <Box mt={"2px"} mr={"15px"}>
-                <Image w="60px" src="/logo.png" alt="OpenBatch logo" />
+              <Box mt={"2px"} mr={"15px"} w="40px" h="auto">
+                <Image w={"full"} src="/logo.png" alt="OpenBatch logo" />
               </Box>
 
               <Link href="/">
