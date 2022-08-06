@@ -30,11 +30,6 @@ const uploadFileToIPFS = async (file: any): Promise<any> => {
 };
 
 const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
-    console.log(
-        "🔎 ~ file: ipfs.service.ts ~ line 65 ~ uploadFolderToIPFS ~ files",
-        files
-    );
-
     let filesToUpload;
 
     if (isBuffer) {
@@ -62,7 +57,7 @@ const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
                 size: file.size,
             });
         }
-        return addedFiles;
+        return Promise.resolve(`${ipfsInfura}/${addedFiles[0].cid}`);
     } catch (error) {
         console.log("Error when uploading file to IPFS:", error);
     }

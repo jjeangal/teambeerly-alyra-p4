@@ -7,11 +7,7 @@ import {
   FormLabel,
   HStack,
   Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
+  Tag,
   Text,
   useNumberInput,
 } from "@chakra-ui/react";
@@ -29,10 +25,11 @@ export default function CreateCollection() {
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File>();
-  const [imageUrl, setImageUrl] = useState("");
-  const [uriFolder, setUriFolder] = useState<FileList>();
-  const [baseUri, setBaseUri] = useState("");
+  const [imagesFolder, setImagesFolder] = useState<FileList>();
+  const [baseUri, setBaseUri] = useState<string>("");
   const [supply, setSupply] = useState(0);
+
+  const [collectionIsSaving, setCollectionIsSaving] = useState(false);
 
   // Creator earning management
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
@@ -48,24 +45,29 @@ export default function CreateCollection() {
   const dec = getDecrementButtonProps();
   const input = getInputProps();
 
+  const handleFolderSelection = (event: any) => {
+    if (!!event.target.files) {
+      setImagesFolder(event.target.files);
+      setSupply(event.target.files.length);
+    }
+  };
+
   async function createCollection() {
     if (name.length == 0) return alert("Name field is empty.");
     if (symbol.length == 0) return alert("Symbol field is empty.");
     if (description.length == 0) return alert("Description field is empty.");
     if (!imageFile) return alert("Choose a collection image.");
-    if (!uriFolder) return alert("Choose images for collection nfts.");
+    if (!imagesFolder) return alert("Choose images for collection nfts.");
     if (supply <= 0) return alert("Supply must be higher than 0.");
 
-    // const tokenMetadatas = [{}];
     // 1) création du dossier d'images, avec les images dedans dans IPFS => OK
-    // 2) création du metadata de chaque item, avec push sur IPFS
-    // 3) création du metadata de la collection à partir du résultat (info collection + infos de tous les items)
-    // 4) création des interactions avec le contracts
+    // 2) création du metadata de chaque item, avec push sur IPFS => OK
+    // 3) création du metadata de la collection à partir du résultat (info collection + infos de tous les items) => OK
+    // 4) création des interactions avec le contracts => TODO
 
-    await generateIPFSLinks(imageFile, uriFolder);
-    // const metadatas = generateMetaData([]);
-    // console.log(metadatas);
-    // await uploadMetaDataIPFS(metadatas);
+    setCollectionIsSaving(true);
+    await generateIPFSLinks(imageFile, imagesFolder);
+    setCollectionIsSaving(false);
   }
 
   const generateIPFSLinks = async (imageFile: File, imagesFolder: FileList) => {
@@ -78,8 +80,6 @@ export default function CreateCollection() {
       cidFolder,
       itemsMetadatas
     );
-
-    // await uploadFolderToIPFS(itemsMetadatas);
 
     const jsonFileCollection = new File(
       [JSON.stringify(collectionMetadata)],
@@ -106,15 +106,14 @@ export default function CreateCollection() {
       };
     });
 
-    const cidJson = await uploadAllMetadata(filesList);
-    console.log(
-      "🔎 ~ file: create-collection.tsx ~ line 92 ~ generateIPFSLinks ~ urlAllJson",
-      cidJson
-    );
-  };
+    const jsonFolderCIDUrl: string =
+      (await uploadFolderToIPFS(filesList, true)) || "";
+    console.log("cidJson ALL (URL)", jsonFolderCIDUrl);
 
-  const uploadAllMetadata = async (itemsMetadatas: any[]) => {
-    await uploadFolderToIPFS(itemsMetadatas, true);
+    // TODO: Use this variable to create the collection (baseUri)
+    const jsonFolderCID: any = jsonFolderCIDUrl.split("/").pop();
+    setBaseUri(jsonFolderCID);
+    console.log("cidJson ALL", jsonFolderCID);
   };
 
   const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
@@ -240,9 +239,7 @@ export default function CreateCollection() {
               type="file"
               name="folderPicker"
               webkitdirectory={"true"}
-              onChange={(e) => {
-                if (e.target.files != null) setUriFolder(e.target.files);
-              }}
+              onChange={handleFolderSelection}
             />
           </FormControl>
         </Box>
@@ -264,23 +261,19 @@ export default function CreateCollection() {
           <FormControl>
             <FormLabel>Supply</FormLabel>
             <FormHelperText mb={3}>
-              You must specify the maximum amount of tokens that can be minted.
+              Specified from the number of files in the folder you have selected
             </FormHelperText>
-            <NumberInput
-              defaultValue={0}
-              min={1}
-              value={supply}
-              onChange={(num) => setSupply(parseInt(num, 10))}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+
+            <Tag size="lg" colorScheme="green" borderRadius="full">
+              <Text>{supply}</Text>
+            </Tag>
           </FormControl>
         </Box>
         <Button
+          isLoading={collectionIsSaving}
+          loadingText="Loading"
+          spinnerPlacement="end"
+          mt={"2em"}
           colorScheme={"purple"}
           bg={"purple.800"}
           color={"white"}

@@ -54,19 +54,19 @@ export default function Home() {
   const collections = [
     {
       avatar: getAvatar("lorem"),
-      imageUrl: getIPFSImageUrl(testCID, "20.png"),
+      imageUrl: getIPFSImageUrl(testCID, "1.png"),
     },
     {
       avatar: getAvatar("ipsum"),
-      imageUrl: getIPFSImageUrl(testCID, "21.png"),
+      imageUrl: getIPFSImageUrl(testCID, "2.png"),
     },
     {
       avatar: getAvatar("dolor"),
-      imageUrl: getIPFSImageUrl(testCID, "22.png"),
+      imageUrl: getIPFSImageUrl(testCID, "3.png"),
     },
     {
       avatar: getAvatar("amet"),
-      imageUrl: getIPFSImageUrl(testCID, "23.png"),
+      imageUrl: getIPFSImageUrl(testCID, "4.png"),
     },
   ];
 

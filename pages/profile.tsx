@@ -33,16 +33,19 @@ export default function Profile() {
 
   const userCollections = [
     {
-      imageUrl: getIPFSImageUrl(testCID, "5.png"),
+      imageUrl: getIPFSImageUrl(testCID, "15.png"),
     },
     {
-      imageUrl: getIPFSImageUrl(testCID, "6.png"),
+      imageUrl: getIPFSImageUrl(testCID, "16.png"),
     },
     {
-      imageUrl: getIPFSImageUrl(testCID, "7.png"),
+      imageUrl: getIPFSImageUrl(testCID, "17.png"),
     },
     {
-      imageUrl: getIPFSImageUrl(testCID, "8.png"),
+      imageUrl: getIPFSImageUrl(testCID, "18.png"),
+    },
+    {
+      imageUrl: getIPFSImageUrl(testCID, "15.png"),
     },
   ];
 
@@ -59,55 +62,62 @@ export default function Profile() {
   return (
     <Layout>
       {address ? (
-        <Container w={"full"} centerContent>
-          <Box>
-            <Image
-              borderRadius="full"
-              boxSize="150px"
-              src={getAvatar(address)}
-              alt="Dan Abramov"
-            />
-          </Box>
-          <HStack align={"baseline"} mt={"2em"}>
-            <Text fontFamily={"mono"} fontSize={"16px"}>
-              {address}
-            </Text>
-            <Tooltip
-              hasArrow
-              label={hasCopied ? "Copied" : "Copy"}
-              closeDelay={300}
-            >
-              <IconButton
-                aria-label="Copy address"
-                onClick={onCopy}
-                icon={<CopyIcon />}
+        <>
+          <Container w={"full"} centerContent>
+            <Box>
+              <Image
+                borderRadius="full"
+                boxSize="150px"
+                src={getAvatar(address)}
+                alt="Dan Abramov"
               />
-            </Tooltip>
-          </HStack>
-          <Box mt={"2em"}>
-            <Text fontSize={"16px"}>
-              {/* TODO: fetch number of collections for the address */}4
-              collections
-            </Text>
-          </Box>
-          <Box mt={"2em"}>
-            {balance ? (
-              <Text fontSize={"16px"}>
-                <strong>Balance</strong> : {balance} ETH
+            </Box>
+            <HStack align={"baseline"} mt={"2em"}>
+              <Text fontFamily={"mono"} fontSize={"16px"}>
+                {address}
               </Text>
-            ) : (
-              <Spinner />
-            )}
-          </Box>
-          <Box mt={"4em"}>
-            <Link href="/create-collection">
-              <Button colorScheme={"purple"} bg={"purple.700"}>
-                <a>Create new collection</a>
-              </Button>
-            </Link>
-          </Box>
-
-          <Flex gap={"1em"} mt={"4em"}>
+              <Tooltip
+                hasArrow
+                label={hasCopied ? "Copied" : "Copy"}
+                closeDelay={300}
+              >
+                <IconButton
+                  aria-label="Copy address"
+                  onClick={onCopy}
+                  icon={<CopyIcon />}
+                />
+              </Tooltip>
+            </HStack>
+            <Box mt={"2em"}>
+              <Text fontSize={"16px"}>
+                {/* TODO: fetch number of collections for the address */}4
+                collections
+              </Text>
+            </Box>
+            <Box mt={"2em"}>
+              {balance ? (
+                <Text fontSize={"16px"}>
+                  <strong>Balance</strong> : {balance} ETH
+                </Text>
+              ) : (
+                <Spinner />
+              )}
+            </Box>
+            <Box mt={"4em"}>
+              <Link href="/create-collection">
+                <Button colorScheme={"purple"} bg={"purple.700"}>
+                  <a>Create new collection</a>
+                </Button>
+              </Link>
+            </Box>
+          </Container>
+          <Flex
+            columnGap={"2em"}
+            rowGap={"3em"}
+            mt={"4em"}
+            flexWrap={"wrap"}
+            justifyContent={"flex-start"}
+          >
             {userCollections.map((collection, index) => (
               <CardLg
                 key={index}
@@ -116,7 +126,7 @@ export default function Profile() {
               ></CardLg>
             ))}
           </Flex>
-        </Container>
+        </>
       ) : (
         <Container w={"full"} centerContent>
           You are not connected
