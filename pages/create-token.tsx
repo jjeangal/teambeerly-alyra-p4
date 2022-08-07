@@ -36,10 +36,8 @@ export default function CreateToken() {
   });
 
   //Get contracts
-  const {
-    marketPlaceContractAsSigner,
-    blyTokenContractAsSigner: erc721ContractAsSigner,
-  } = useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner, blyTokenContractAsSigner } =
+    useContext(MarketPlaceContext);
 
   const createNFT = async () => {
     const { name, description } = formInput;
@@ -56,9 +54,9 @@ export default function CreateToken() {
       const transaction = await uploadFileToIPFS(jsonFileCollection);
       console.log(transaction);
 
-      const tokenCreation = await erc721ContractAsSigner.mint(transaction);
-      await tokenCreation.wait();
-      console.log("token created");
+      const tokenCreation = await blyTokenContractAsSigner.mint(transaction);
+      const receipt = await tokenCreation.wait();
+      console.log("token created: ", receipt);
     } catch (error) {
       console.log("Error on mint NFT: ", error);
     }
@@ -70,7 +68,7 @@ export default function CreateToken() {
         <Text fontSize={"3xl"} fontWeight={"bold"}>
           Create New NFT
         </Text>
-        <Box mt={"2em"} w={"full"}>
+        <Box mt={"6em"} w={"full"}>
           <FormControl isRequired>
             <FormLabel>Image</FormLabel>
             <Input
@@ -108,29 +106,7 @@ export default function CreateToken() {
             />
           </FormControl>
         </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Base Uri</FormLabel>
-            <FormHelperText mb={3}>
-              Si vous avez deja une URI mettez la ici:
-            </FormHelperText>
-            <Input type="text" />
-          </FormControl>
-        </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Creator earnings</FormLabel>
-            <FormHelperText mb={3}>
-              Define a price to be payed in order to mint an NFT from the
-              collection (ETH).
-            </FormHelperText>
-            {/* <HStack maxW="full">
-              <Button {...dec}>-</Button>
-              <Input {...input} />
-              <Button {...inc}>+</Button>
-            </HStack> */}
-          </FormControl>
-        </Box>
+        <Box mt={"2em"} w={"full"}></Box>
         {/* Need to change to a search user's collection form (with none) */}
         {/* <Box mt={"2em"} w={"full"}>
           <FormControl>
