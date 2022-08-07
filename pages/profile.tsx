@@ -7,6 +7,7 @@ import {
   HStack,
   IconButton,
   Image,
+  list,
   Spinner,
   Text,
   Tooltip,
@@ -17,6 +18,7 @@ import { ethers } from "ethers";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import CardItem from "../components/cards/Card-item";
+
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
@@ -27,12 +29,23 @@ export default function Profile() {
   const address = useAddress() || "";
   const signer = useSigner();
   const [balance, setBalance] = useState("");
-  const [listedItems, setListedItems] = useState();
+  const [ownedItems, setOwnedItems] = useState();
   const [allItems, setAllItems] = useState<any[]>([]);
   const { hasCopied, onCopy } = useClipboard(address);
 
   const { factoryContractAsSigner } = useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
+  //Simple NFT:
+
+  //Get the NFT by the owner
+  const getNFTByOwner = async () => {
+    const nfts = await marketPlaceContractAsSigner.fetchSales(address);
+    setOwnedItems(nfts);
+  };
+
+  //Collections:
+  //Get the collection of the owner
   const getOwnerCollections = async (ownerAddress: string) => {
     try {
       const ownerCollections =
@@ -44,6 +57,7 @@ export default function Profile() {
     }
   };
 
+  //Get metadata of the collections
   const getOwnerCollectionsMetaData = async (ownerCollections: string[]) => {
     const requests: Promise<any>[] = [];
 
@@ -82,14 +96,6 @@ export default function Profile() {
     }
   };
 
-  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
-
-  const getAccountItemsOnMarketplace = async () => {
-    const items = await marketPlaceContractAsSigner.fetchSales(address);
-    console.log("getAccountItemsOnMarketplace", items);
-    setListedItems(items);
-  };
-
   useEffect(() => {
     if (signer) {
       (async () => {
@@ -108,6 +114,8 @@ export default function Profile() {
 
         // Get collections Metadatas
         const allCollections = await getOwnerCollectionsJson(allJsonCIDs);
+
+        //Get NFT
 
         const _allItems: any[] = [];
         allCollections.forEach((col, collectionIndex) => {

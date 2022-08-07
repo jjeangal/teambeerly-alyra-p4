@@ -28,6 +28,7 @@ contract Marketplace is ReentrancyGuard {
         uint256 tokenId;
         uint256 price;
         address payable seller;
+        bool isSell;
     }
 
     //Keep track of the items listed
@@ -81,7 +82,8 @@ contract Marketplace is ReentrancyGuard {
             _nft,
             newTokenId,
             _price,
-            payable(msg.sender)
+            payable(msg.sender),
+            false
         );
 
         emit MarketItemCreated(address(_nft), newTokenId, _price, msg.sender);
@@ -112,9 +114,12 @@ contract Marketplace is ReentrancyGuard {
         // Transfer NFT to buyer*
         item.nft.transferFrom(address(this), msg.sender, item.tokenId);
 
-        //delete the NFT on the mapping and decrement tokenId
-        _tokenIds.decrement();
-        delete idToItem[_itemId];
+        item.isSell = true;
+        item.seller = payable(msg.sender);
+
+        // //delete the NFT on the mapping and decrement tokenId
+        // _tokenIds.decrement();
+        // delete idToItem[_itemId];
 
         //event
         emit MarketItemBought(
