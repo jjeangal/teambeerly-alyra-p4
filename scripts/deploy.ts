@@ -8,7 +8,7 @@ async function main() {
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
     // NFT contract
-    const NFT = await ethers.getContractFactory("NFT");
+    const NFT = await ethers.getContractFactory("BlyToken");
     const nft = await NFT.deploy();
     await nft.deployed();
     console.log("Contract NFT deployed to:", nft.address);
@@ -18,6 +18,12 @@ async function main() {
     const marketplace = await Marketplace.deploy(1);
     await marketplace.deployed();
     console.log("Contract Marketplace deployed to:", marketplace.address);
+
+    //Factory contract
+    const Factory = await ethers.getContractFactory("NFTFactory");
+    const factory = await Factory.deploy();
+    await factory.deployed();
+    console.log("Contract Factory deployed to: ", factory.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

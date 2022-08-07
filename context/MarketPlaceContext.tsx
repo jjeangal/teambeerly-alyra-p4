@@ -32,6 +32,7 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
   const [marketPlaceContract, setMarketPlaceContract] = useState<Contract>();
   const [marketPlaceContractAsSigner, setMarketPlaceContractAsSigner] =
     useState<Contract>();
+
   const [erc721Contract, setErc721Contract] = useState<Contract>();
   const [erc721ContractAsSigner, setErc721ContractAsSigner] =
     useState<Contract>();
@@ -99,53 +100,3 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
     </MarketPlaceContext.Provider>
   );
 };
-
-// TODO: Put this code into a service in order to call function from
-// everywhere we want after app loaded
-
-//Principal function
-// export const NFTProvider = ({ children }) => {
-
-//URL to stock the data on IPFS
-// const client = ipfsHttpsClient("https:/ifps.infura.io:5001/api/v0");
-
-//   const uploadToIPFS = async (file, setFileUrl) => {
-//     try {
-//       const added = await client.add({ content: file });
-//       const uri = `https://ipfs.infura.io/ipfs/${added.path}`;
-
-//       return uri;
-//     } catch (error) {
-//       console.log("Error when uploading file to IPFS");
-//     }
-//   };
-
-//   const createNFT = async (formInput, fileUrl, router) => {
-//     const { name, description, price } = formInput;
-
-//     if (!name || !description || !price || !fileUrl) return;
-//     try {
-//       const data = JSON.stringify({ name, description, image: fileUrl });
-//       const added = await client.add(data);
-
-//       await createSale(url, price);
-//       router.push("/");
-//     } catch (error) {
-//       console.log("Error when creating NFT");
-//     }
-//   };
-
-//   const createSale = async (inputPrice, id) => {
-//     const uri = `https://ipfs.infura.io/ipfs/${added.path}`;
-
-//     //mint NFT
-//     await (await nft.mint(uri)).wait();
-
-//     //get ID
-//     const tokenId = await nft.tokenId();
-//     const price = ethers.utils.parseUnits(inputPrice, "ether");
-
-//     const transaction = await nft.mint;
-//   };
-
-// };

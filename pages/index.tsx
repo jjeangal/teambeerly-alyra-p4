@@ -18,11 +18,12 @@ import {
 import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getAvatar, getImageUrl } from "../services/utils";
+import { getAvatar } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
 import { useContext, useEffect } from "react";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
+import { getIPFSImageUrl } from "../services/ipfs.service";
 
 export default function Home() {
   const {
@@ -48,22 +49,24 @@ export default function Home() {
     }
   }, [marketPlaceContract]);
 
+  const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
+
   const collections = [
     {
       avatar: getAvatar("lorem"),
-      imageUrl: getImageUrl("20.png"),
+      imageUrl: getIPFSImageUrl(testCID, "1.png"),
     },
     {
       avatar: getAvatar("ipsum"),
-      imageUrl: getImageUrl("21.png"),
+      imageUrl: getIPFSImageUrl(testCID, "2.png"),
     },
     {
       avatar: getAvatar("dolor"),
-      imageUrl: getImageUrl("22.png"),
+      imageUrl: getIPFSImageUrl(testCID, "3.png"),
     },
     {
       avatar: getAvatar("amet"),
-      imageUrl: getImageUrl("23.png"),
+      imageUrl: getIPFSImageUrl(testCID, "4.png"),
     },
   ];
 
@@ -83,7 +86,7 @@ export default function Home() {
                 color={"white"}
                 variant="solid"
               >
-                <a>Explore</a>
+                Explore
               </Button>
             </Link>
 
@@ -94,7 +97,7 @@ export default function Home() {
                 color={"white"}
                 variant="solid"
               >
-                <a>Create</a>
+                Create
               </Button>
             </Link>
           </HStack>
