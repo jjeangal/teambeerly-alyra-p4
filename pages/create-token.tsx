@@ -1,10 +1,6 @@
 import { useState, useContext, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDropzone } from "react-dropzone";
-import { create } from "ipfs-http-client";
-import { MarketPlaceContext } from "../context/MarketPlaceContext";
-
-import Layout from "../components/Layout/Layout";
 import {
   Box,
   Button,
@@ -17,20 +13,19 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
+
+import Layout from "../components/Layout/Layout";
+
+import {
+  ipfsInfura,
+  uploadFileToIPFS,
+  uploadFolderToIPFS,
+} from "../services/ipfs.service";
+
 //Create IPFS clients
 const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
 const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
-const auth =
-  "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-
-const client = create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-  headers: {
-    authorization: auth,
-  },
-});
 
 export default function CreateToken() {
   //Form input
@@ -40,8 +35,6 @@ export default function CreateToken() {
     name: "",
     description: "",
   });
-
-  let ipfsUrlc;
 
   //Get contracts
   const {
@@ -53,7 +46,7 @@ export default function CreateToken() {
   //Function triggered on image drop
   const onDrop = useCallback(async (acceptedFile: any) => {
     try {
-      const url: any = await uploadToIPFS(acceptedFile[0]);
+      const url: any = await uploadFileToIPFS(acceptedFile[0]);
       setFileUrl(url);
     } catch (error) {
       console.log("ipfs image upload error: ", error);
@@ -74,16 +67,6 @@ export default function CreateToken() {
     maxSize: 5000000,
   });
 
-  const uploadToIPFS = async (file: any) => {
-    try {
-      const added = await client.add(file);
-      const url = `https://openbatch.infura-ipfs.io/ipfs/${added.path}`;
-      return url;
-    } catch (error) {
-      console.log("Error when uploading file to IPFS:", error);
-    }
-  };
-
   const createNFT = async () => {
     const { image, name, description } = formInput;
     if (!image || !name || !description) return;
@@ -92,19 +75,15 @@ export default function CreateToken() {
         JSON.stringify({ image, name, description })
       );
       const added = await client.add(result);
+
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       console.log("IPFS: ", url);
-      const tokenCreation = await erc721Contract.mint(url);
+      const tokenCreation = await erc721ContractAsSigner.mint(url);
       await tokenCreation.wait();
       console.log("token created");
     } catch (error) {
       console.log("ipfs uri upload error: ", error);
     }
-  };
-
-  const verify = () => {
-    console.log(fileUrl);
-    console.log(client);
   };
 
   return (
