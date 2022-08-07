@@ -6,7 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /// @title Factory ERC721 Contract 
-/// @author Team Beerly
+/// @author Jean Gal at OpenBatch
+/// @notice This contract is used to create NFT's collection
 contract NFTFactory is ReentrancyGuard, Ownable {
 
   event CollectionCreated(address _collectionAddress, address _owner);
@@ -17,9 +18,11 @@ contract NFTFactory is ReentrancyGuard, Ownable {
   /// Maps the collection addresses to the contract owner addresses 
   mapping(address => address[]) public ownerToCollections;
  
-  /// Create a new collection
-  /// @notice Adds the owner and collection address to a mapping
-  /// @return The address of the collection created
+
+  /// @notice Create a new collection
+  /// @dev Adds the owner and collection address to a mapping
+  /// @param _name, _symbol, _tokenUri, _image, _maxSupply, _mintFee
+  /// @return collectionAddress The address of the collection created
   function createCollection(
     string calldata _name, 
     string calldata _symbol, 
@@ -38,11 +41,34 @@ contract NFTFactory is ReentrancyGuard, Ownable {
     return collectionAddress;
   }
 
-  /// Mint a token from a chosen collection
+
+  ///@notice function to mint from collections
+  ///@param _collectionAddress
+  ///@return tokenId
+  function mintFromCollection(address _collectionAddress) external payable nonReentrant returns (uint256) {
+    uint256 mintFee = getCollectionMintFee(_collectionAddress);
+    require(
+      msg.value >= mintFee, 
+      "Minting price not satisfied."
+    );
+    
+    address collectionOwner = _owners[_collectionAddress];
+    payable(collectionOwner).transfer(msg.value);
+    uint256 tokenId = _collections[_collectionAddress].mint();
+
+    emit NFTMinted(_collectionAddress, tokenId);
+    
+
+    return(tokenId);
+  }
+
+  ///@dev the following functions are used to get info from collections
+
+  /// @notice Mint a token from a chosen collection
   /// @dev Message must be sent with an amount of ethers equal to the minting fee
-  /// @notice Owner gets transfered the minting fee amount
+  /// @dev Owner gets transfered the minting fee amount
   /// @param _collectionAddress The address of the collection
-  /// @return The id of the minted token
+  /// @return name The id of the minted token
   function mintFromCollection(address _collectionAddress) external payable onlyOwner nonReentrant returns (uint256) {
     uint256 tokenId = collections[_collectionAddress].mint();
     emit NFTMinted(_collectionAddress, tokenId);
@@ -57,30 +83,34 @@ contract NFTFactory is ReentrancyGuard, Ownable {
 
   /// @notice Returns the name of a collection
   /// @param _collectionAddress The address of the collection
+  /// @return name The collection name
   function getCollectionName(address _collectionAddress) external view returns(string memory) {
     return(collections[_collectionAddress].name());
   }
 
   /// @notice Returns the symbol of a collection
   /// @param _collectionAddress The address of the collection
+  /// @return symbol of the collection
   function getCollectionSymbol(address _collectionAddress) external view returns(string memory) {
     return(collections[_collectionAddress].symbol());
   }
 
   /// @notice Returns the base uri of a collection
   /// @param _collectionAddress The address of the collection
+  ///@return _baseTokenURI la base URI de la collection
   function getCollectionBaseUri(address _collectionAddress) external view returns(string memory) {
     return(collections[_collectionAddress].baseTokenURI());
   }
 
   /// @notice Returns the link of a collection's image
-  /// @param _collectionAddress The address of the collection
+  /// @param _collectionAddress
+  /// @param _imageCid
   function getCollectionImage(address _collectionAddress) external view returns(string memory) {
     return(collections[_collectionAddress].imageCid());
   }
-
-  /// @notice Returns the max supply of tokens that a collection allows
+ 
   /// @param _collectionAddress The address of the collection
+  ///@return _maxSupply the max supply of tokens that a collection allows
   function getCollectionMaxSupply(address _collectionAddress) external view returns(uint256) {
     return(collections[_collectionAddress].maxSupply());
   }
@@ -91,6 +121,17 @@ contract NFTFactory is ReentrancyGuard, Ownable {
   function getTokenUri(address _collectionAddress, uint256 _tokenId) external view returns(string memory) {
     return(collections[_collectionAddress].tokenURI(_tokenId));
   }
+
+  ///@param _collectionAddress
+  ///@return _owners
+  function getCollectionOwner(address _collectionAddress) public view returns(address) {
+    return(_owners[_collectionAddress]);
+  }
+
+  ///@param _collectionAddress
+  ///@return mintFee
+  function getCollectionMintFee(address _collectionAddress) public view returns(uint256) {
+    return(_collections[_collectionAddress]._mintFee());
 
   /// @notice Returns the owner of a collection
   /// @param _collectionAddress The address of the collection

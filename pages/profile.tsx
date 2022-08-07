@@ -1,3 +1,4 @@
+import { useStatStyles } from "@chakra-ui/react";
 import { CopyIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -17,19 +18,29 @@ import {
 import { useAddress, useSigner } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import CardLg from "../components/cards/Card-lg";
-import Layout from "../components/Layout/Layout";
+import { useContext, useEffect, useState } from "react";
 import { getIPFSImageUrl } from "../services/ipfs.service";
 import { getAvatar } from "../services/utils";
+
+import CardLg from "../components/cards/Card-lg";
+import Layout from "../components/Layout/Layout";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
 
 export default function Profile() {
   const address = useAddress() || "";
   const signer = useSigner();
   const [balance, setBalance] = useState("");
+  const [listedItems, setListedItems] = useState();
   const { hasCopied, onCopy } = useClipboard(address);
 
   const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
+
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
+
+  const getAccountItemsOnMarketplace = async () => {
+    const items = await marketPlaceContractAsSigner.fetchSales();
+    setListedItems(items);
+  };
 
   const userCollections = [
     {
