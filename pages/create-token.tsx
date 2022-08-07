@@ -1,6 +1,5 @@
 import { useState, useContext, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useDropzone } from "react-dropzone";
 import {
   Box,
   Button,
@@ -31,7 +30,7 @@ export default function CreateToken() {
   //Form input
   const [fileUrl, setFileUrl] = useState("");
   const [formInput, setFormInput] = useState({
-    image: "",
+    image: File,
     name: "",
     description: "",
   });
@@ -42,47 +41,23 @@ export default function CreateToken() {
     blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
-  /* Get the dropped Image */
-  //Function triggered on image drop
-  const onDrop = useCallback(async (acceptedFile: any) => {
-    try {
-      const url: any = await uploadFileToIPFS(acceptedFile[0]);
-      setFileUrl(url);
-    } catch (error) {
-      console.log("ipfs image upload error: ", error);
-    }
-  }, []);
-
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
-    onDrop,
-    accept: {
-      "image/*": [".gif"],
-    },
-    maxSize: 5000000,
-  });
-
   const createNFT = async () => {
     const { image, name, description } = formInput;
     if (!image || !name || !description) return;
     try {
-      const result = await client.add(
-        JSON.stringify({ image, name, description })
+      const jsonFileCollection = new File(
+        [JSON.stringify(formInput)],
+        `_metadata.json`,
+        { type: "application/json" }
       );
-      const added = await client.add(result);
+      const transaction = await uploadFileToIPFS(jsonFileCollection);
+      console.log(transaction);
 
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      console.log("IPFS: ", url);
-      const tokenCreation = await erc721ContractAsSigner.mint(url);
+      const tokenCreation = await erc721ContractAsSigner.mint(transaction);
       await tokenCreation.wait();
       console.log("token created");
     } catch (error) {
-      console.log("ipfs uri upload error: ", error);
+      console.log("Error on mint NFT: ", error);
     }
   };
 
@@ -92,14 +67,19 @@ export default function CreateToken() {
         <Text fontSize={"3xl"} fontWeight={"bold"}>
           Create New NFT
         </Text>
-        {/* Need to change this to an upload image form */}
-        <Box mt={"2em"} w={"full"} {...getRootProps()}>
+        <Box mt={"2em"} w={"full"}>
           <FormControl isRequired>
-            <FormLabel>Click here to upload an Image</FormLabel>
+            <FormLabel>Banner image</FormLabel>
+            <FormHelperText mb={3}>
+              The banner image url for the collection.
+            </FormHelperText>
             <Input
-              onChange={(e) =>
-                setFormInput({ ...formInput, image: e.target.value })
-              }
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={(e) => {
+                if (e.target.files != null)
+                  setFormInput({ ...formInput, image: e.target.files[0] });
+              }}
             />
           </FormControl>
         </Box>
@@ -153,20 +133,16 @@ export default function CreateToken() {
           </FormControl>
         </Box>
         {/* Need to change to a search user's collection form (with none) */}
-        <Box mt={"2em"} w={"full"}>
+        {/* <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Collection</FormLabel>
             <FormHelperText mb={3}>
               If you want to put the NFT on on of your collection:
             </FormHelperText>
             <Input type="text" />
           </FormControl>
-        </Box>
+        </Box> */}
         <Box mt={"3em"} w={"full"} onClick={createNFT}>
-          <Button>create</Button>
-        </Box>
-        {/* Button for dev */}
-        <Box mt={"3em"} w={"full"} onClick={verify}>
           <Button>create</Button>
         </Box>
       </Container>
