@@ -17,17 +17,70 @@ import {
 import { useAddress, useSigner } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getIPFSImageUrl } from "../services/ipfs.service";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
+import { getIPFSImageUrl, ipfsInfura } from "../services/ipfs.service";
 import { getAvatar } from "../services/utils";
 
 export default function Profile() {
   const address = useAddress() || "";
   const signer = useSigner();
   const [balance, setBalance] = useState("");
+  const [collections, setCollections] = useState<any[]>([]);
   const { hasCopied, onCopy } = useClipboard(address);
+
+  const { factoryContractAsSigner } = useContext(MarketPlaceContext);
+
+  const getOwnerCollections = async (ownerAddress: string) => {
+    try {
+      const ownerCollections =
+        await factoryContractAsSigner.getCollectionsOfOwner(ownerAddress);
+      return Promise.resolve(ownerCollections);
+    } catch (error) {
+      console.log("Error when fetching owner collections : ", error);
+      return Promise.reject(error);
+    }
+  };
+
+  const getOwnerCollectionsMetaData = async (ownerCollections: string[]) => {
+    const requests: Promise<any>[] = [];
+
+    ownerCollections.forEach((ownerCollection: string) => {
+      requests.push(
+        factoryContractAsSigner.getCollectionBaseUri(ownerCollection)
+      );
+    });
+
+    try {
+      const ownerCollectionsMetaData = await Promise.all(requests);
+      return Promise.resolve(ownerCollectionsMetaData);
+    } catch (error) {
+      console.log("Error when fetching owner collection CID : ", error);
+      return Promise.reject(error);
+    }
+  };
+
+  const getOwnerCollectionsJson = async (ownerCollectionsJsonCid: string[]) => {
+    const requests: Promise<any>[] = [];
+
+    ownerCollectionsJsonCid.forEach((collectionCid: string) => {
+      requests.push(fetch(`${ipfsInfura}/${collectionCid}/_metadata.json`));
+    });
+
+    try {
+      const ownerCollectionsJson = await Promise.all(requests).then(
+        async (res) => {
+          return Promise.all(res.map(async (data) => await data.json()));
+        }
+      );
+      return Promise.resolve(ownerCollectionsJson);
+    } catch (error) {
+      console.log("Error when fetching owner collection CID : ", error);
+      return Promise.reject(error);
+    }
+  };
 
   const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
 
@@ -55,6 +108,19 @@ export default function Profile() {
         const walletBalance = await signer.getBalance();
         const currentBalance = ethers.utils.formatEther(walletBalance);
         setBalance(currentBalance.substring(0, 6));
+        const ownerCollections = await getOwnerCollections(address);
+
+        console.log("ownerCollections", ownerCollections);
+        const allJsonCIDs = await getOwnerCollectionsMetaData(ownerCollections);
+        console.log("allJsonCIDs", allJsonCIDs);
+        const allCollections = await getOwnerCollectionsJson(allJsonCIDs);
+        console.log("allCollections", allCollections);
+
+        allCollections.map((col, index) => {
+          col.address = ownerCollections[index];
+          return col;
+        });
+        setCollections(allCollections);
       })();
     }
   }, [signer]);
@@ -90,8 +156,8 @@ export default function Profile() {
             </HStack>
             <Box mt={"2em"}>
               <Text fontSize={"16px"}>
-                {/* TODO: fetch number of collections for the address */}4
-                collections
+                {collections.length + " "}
+                collection(s)
               </Text>
             </Box>
             <Box mt={"2em"}>
@@ -111,21 +177,24 @@ export default function Profile() {
               </Link>
             </Box>
           </Container>
-          <Flex
-            columnGap={"2em"}
-            rowGap={"3em"}
-            mt={"4em"}
-            flexWrap={"wrap"}
-            justifyContent={"flex-start"}
-          >
-            {userCollections.map((collection, index) => (
-              <CardLg
-                key={index}
-                imageUrl={collection.imageUrl}
-                viewOwner={false}
-              ></CardLg>
-            ))}
-          </Flex>
+
+          {collections.length > 0 && (
+            <Flex
+              columnGap={"2em"}
+              rowGap={"3em"}
+              mt={"4em"}
+              flexWrap={"wrap"}
+              justifyContent={"center"}
+            >
+              {collections.map((collection, index) => (
+                <CardLg
+                  collectionInfos={collection}
+                  key={index}
+                  viewOwner={false}
+                ></CardLg>
+              ))}
+            </Flex>
+          )}
         </>
       ) : (
         <Container w={"full"} centerContent>
