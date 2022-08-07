@@ -57,11 +57,8 @@ const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
                 size: file.size,
             });
         }
-        if (isBuffer) {
-            return Promise.resolve(`${ipfsInfura}/${addedFiles[0].cid}`);
-        } else {
-            return Promise.resolve(`${addedFiles[addedFiles.length - 1].cid}`);
-        }
+        const { cid } = addedFiles[addedFiles.length - 1];
+        return Promise.resolve(cid);
     } catch (error) {
         console.log("Error when uploading file to IPFS:", error);
     }
