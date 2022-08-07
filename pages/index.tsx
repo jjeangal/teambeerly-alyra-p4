@@ -29,8 +29,8 @@ export default function Home() {
   const {
     marketPlaceContract,
     marketPlaceContractAsSigner,
-    erc721Contract,
-    erc721ContractAsSigner,
+    blyTokenContract: erc721Contract,
+    blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
   async function getFees() {

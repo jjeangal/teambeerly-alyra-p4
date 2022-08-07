@@ -47,8 +47,8 @@ export default function CreateToken() {
   const {
     marketPlaceContract,
     marketPlaceContractAsSigner,
-    erc721Contract,
-    erc721ContractAsSigner,
+    blyTokenContract: erc721Contract,
+    blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
   /* Get the dropped Image */

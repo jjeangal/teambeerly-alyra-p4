@@ -5,22 +5,28 @@ import {
   marketplaceAddressAbi,
   blyTokenAddress,
   blyTokenAddressAbi,
+  factoryAddress,
+  factoryAddressAbi,
   networkCurrency,
 } from "./constants";
 
 type MarketPlaceContextValues = {
   marketPlaceContract: any;
   marketPlaceContractAsSigner: any;
-  erc721Contract: any;
-  erc721ContractAsSigner: any;
+  blyTokenContract: any;
+  blyTokenContractAsSigner: any;
+  factoryContract: any;
+  factoryContractAsSigner: any;
   networkCurrency: string;
 };
 
 export const MarketPlaceContext = createContext<MarketPlaceContextValues>({
   marketPlaceContract: {} as Contract,
   marketPlaceContractAsSigner: {} as Contract,
-  erc721Contract: {} as Contract,
-  erc721ContractAsSigner: {} as Contract,
+  blyTokenContract: {} as Contract,
+  blyTokenContractAsSigner: {} as Contract,
+  factoryContract: {} as Contract,
+  factoryContractAsSigner: {} as Contract,
   networkCurrency,
 });
 
@@ -31,6 +37,10 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
 
   const [erc721Contract, setErc721Contract] = useState<Contract>();
   const [erc721ContractAsSigner, setErc721ContractAsSigner] =
+    useState<Contract>();
+
+  const [factoryContract, setFactoryContract] = useState<Contract>();
+  const [factoryContractAsSigner, setFactoryContractAsSigner] =
     useState<Contract>();
 
   useEffect(() => {
@@ -67,19 +77,33 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
     );
     setMarketPlaceContractAsSigner(_marketPlaceContractAsSigner);
 
-    const _erc721Contract = new ethers.Contract(
+    const _blyTokenContract = new ethers.Contract(
       blyTokenAddress,
       blyTokenAddressAbi,
       provider
     );
-    setErc721Contract(_erc721Contract);
+    setErc721Contract(_blyTokenContract);
 
-    const _erc721ContractAsSigner = new ethers.Contract(
+    const _blyTokenContractAsSigner = new ethers.Contract(
       blyTokenAddress,
       blyTokenAddressAbi,
       provider.getSigner()
     );
-    setErc721ContractAsSigner(_erc721ContractAsSigner);
+    setErc721ContractAsSigner(_blyTokenContractAsSigner);
+
+    const _factoryContract = new ethers.Contract(
+      factoryAddress,
+      factoryAddressAbi,
+      provider
+    );
+    setFactoryContract(_factoryContract);
+
+    const _factoryContractAsSigner = new ethers.Contract(
+      factoryAddress,
+      factoryAddressAbi,
+      provider.getSigner()
+    );
+    setFactoryContractAsSigner(_factoryContractAsSigner);
   }, []);
 
   return (
@@ -87,8 +111,10 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
       value={{
         marketPlaceContract,
         marketPlaceContractAsSigner,
-        erc721Contract,
-        erc721ContractAsSigner,
+        blyTokenContract: erc721Contract,
+        blyTokenContractAsSigner: erc721ContractAsSigner,
+        factoryContract,
+        factoryContractAsSigner,
         networkCurrency,
       }}
     >

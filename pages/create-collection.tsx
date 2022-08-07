@@ -9,8 +9,10 @@ import {
   Tag,
   Text,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useContext, useState } from "react";
 import Layout from "../components/Layout/Layout";
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
 import {
   ipfsInfura,
   uploadFileToIPFS,
@@ -18,13 +20,16 @@ import {
 } from "../services/ipfs.service";
 
 export default function CreateCollection() {
+  const router = useRouter();
+
+  const { factoryContractAsSigner } = useContext(MarketPlaceContext);
+
   // Contract type management
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File>();
   const [imagesFolder, setImagesFolder] = useState<FileList>();
-  const [baseUri, setBaseUri] = useState<string>("");
   const [supply, setSupply] = useState(0);
 
   const [collectionIsSaving, setCollectionIsSaving] = useState(false);
@@ -47,7 +52,8 @@ export default function CreateCollection() {
     // 1) création du dossier d'images, avec les images dedans dans IPFS => OK
     // 2) création du metadata de chaque item, avec push sur IPFS => OK
     // 3) création du metadata de la collection à partir du résultat (info collection + infos de tous les items) => OK
-    // 4) création des interactions avec le contracts => TODO
+    // 4) création des interactions avec le contracts => OK
+    // 5) redirection vers la page collection view
 
     setCollectionIsSaving(true);
     await generateIPFSLinks(imageFile, imagesFolder);
@@ -98,8 +104,43 @@ export default function CreateCollection() {
       (await uploadFolderToIPFS(filesList, true)) || "";
     console.log("CID JSON folder : ", cidJsonFolder);
 
-    // TODO: Use this variable to create the collection (baseUri)
-    setBaseUri(cidJsonFolder);
+    await createCollectionFromContract(urlBannerImage, cidJsonFolder);
+  };
+
+  const createCollectionFromContract = async (
+    urlBannerImage: string,
+    collectionBaseUri: string
+  ) => {
+    const options = {
+      name,
+      symbol,
+      collectionBaseUri,
+      urlBannerImage,
+      supply,
+    };
+    console.log(
+      "🔎 ~ file: create-collection.tsx ~ line 115 ~ createCollectionFromContract ~ options",
+      options
+    );
+    try {
+      const tx = await factoryContractAsSigner.createCollection(
+        name,
+        symbol,
+        collectionBaseUri,
+        urlBannerImage,
+        supply
+      );
+      const txReceipt = await tx.wait();
+
+      console.log("txReceipt : ", txReceipt);
+
+      const event = txReceipt.events.find(
+        (event: any) => event.event === "CollectionCreated"
+      );
+      const newCollectionAddress = event.args._collectionAddress;
+      console.log("newCollectionAddress", newCollectionAddress);
+      router.push(`/collection/${collectionBaseUri}`);
+    } catch (error) {}
   };
 
   const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
