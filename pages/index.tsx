@@ -48,20 +48,48 @@ export default function Home() {
 
   const collections = [
     {
-      avatar: getAvatar("lorem"),
-      imageUrl: getIPFSImageUrl(testCID, "1.png"),
+      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
+      description: "Une jolie description de VTSuccessHyped10",
+      external_url:
+        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
+      image:
+        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
+      items: [{}, {}],
+      name: "VTSuccessHyped10",
     },
     {
-      avatar: getAvatar("ipsum"),
-      imageUrl: getIPFSImageUrl(testCID, "2.png"),
+      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
+      description: "Une jolie description de VTSuccessHyped10",
+      external_url:
+        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
+      image:
+        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
+      items: [{}, {}],
+      name: "VTSuccessHyped10",
     },
     {
-      avatar: getAvatar("dolor"),
-      imageUrl: getIPFSImageUrl(testCID, "3.png"),
+      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
+      description: "Une jolie description de VTSuccessHyped10",
+      external_url:
+        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
+      image:
+        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
+      items: [{}, {}],
+      name: "VTSuccessHyped10",
     },
     {
-      avatar: getAvatar("amet"),
-      imageUrl: getIPFSImageUrl(testCID, "4.png"),
+      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
+      description: "Une jolie description de VTSuccessHyped10",
+      external_url:
+        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
+      image:
+        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
+      items: [{}, {}],
+      name: "VTSuccessHyped10",
     },
   ];
 
@@ -107,8 +135,8 @@ export default function Home() {
               {collections.map((collection, index) => (
                 <SwiperSlide key={index} className={styles.swiper_slide}>
                   <CardLg
-                    avatar={collection.avatar}
-                    imageUrl={collection.imageUrl}
+                    collectionInfos={collection}
+                    owner={collection.owner}
                   ></CardLg>
                 </SwiperSlide>
               ))}
