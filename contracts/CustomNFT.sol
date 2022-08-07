@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 /// @title Customizable ERC721 collection 
-/// @author Jean Gal at OpenBatch
+/// @author Team Beerly
 contract CustomNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -15,8 +15,6 @@ contract CustomNFT is ERC721URIStorage, Ownable {
     string public imageCid;
     uint256 public maxSupply;
     
-    ///@notice set the info of the NFT
-    ///@param _name, _symbol, _custimTokenURI, _image, _supply
     constructor(
         string memory _name, 
         string memory _symbol, 
@@ -30,7 +28,7 @@ contract CustomNFT is ERC721URIStorage, Ownable {
     }
 
     /// @notice Mint a token from the collection
-    /// @return currentCount the count and also token ID
+    /// @return The token id
     function mint() external payable onlyOwner returns(uint256) {
         require(_tokenIds.current() < maxSupply, "Max supply already reached.");
         
@@ -42,8 +40,8 @@ contract CustomNFT is ERC721URIStorage, Ownable {
         return(currentCount);
     }
 
+    /// @notice Returns the base uri of the collection
     /// @dev Overwrites the ERC721 _baseUri() function
-    /// @return baseTokenURI the base uri of the collection
     function _baseURI() internal view virtual override returns (string memory) {
         return baseTokenURI;
     }

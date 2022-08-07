@@ -29,8 +29,8 @@ const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
 export default function CreateToken() {
   //Form input
   const [fileUrl, setFileUrl] = useState("");
+  const [image, setImage] = useState<File>();
   const [formInput, setFormInput] = useState({
-    image: File,
     name: "",
     description: "",
   });
@@ -42,11 +42,14 @@ export default function CreateToken() {
   } = useContext(MarketPlaceContext);
 
   const createNFT = async () => {
-    const { image, name, description } = formInput;
+    const { name, description } = formInput;
     if (!image || !name || !description) return;
     try {
+      const imageUrl = await uploadFileToIPFS(image);
+      console.log(image);
+      const form = { imageUrl, name, description };
       const jsonFileCollection = new File(
-        [JSON.stringify(formInput)],
+        [JSON.stringify(form)],
         `_metadata.json`,
         { type: "application/json" }
       );
@@ -69,16 +72,12 @@ export default function CreateToken() {
         </Text>
         <Box mt={"2em"} w={"full"}>
           <FormControl isRequired>
-            <FormLabel>Banner image</FormLabel>
-            <FormHelperText mb={3}>
-              The banner image url for the collection.
-            </FormHelperText>
+            <FormLabel>Image</FormLabel>
             <Input
               type="file"
               accept="image/png, image/jpeg"
               onChange={(e) => {
-                if (e.target.files != null)
-                  setFormInput({ ...formInput, image: e.target.files[0] });
+                if (e.target.files != null) setImage(e.target.files[0]);
               }}
             />
           </FormControl>
