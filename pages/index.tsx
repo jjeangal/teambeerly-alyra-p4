@@ -20,76 +20,63 @@ import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
+import { getCollection } from "../services/ipfs.service";
+import { meta } from "@dicebear/avatars-identicon-sprites";
 
 export default function Home() {
-  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
+  const { factoryContractAsSigner } = useContext(MarketPlaceContext);
+  const [collections, setCollections] = useState<any>([]);
 
-  async function getFees() {
+  const getCollectionCID = async (collectionAddress: any) => {
     try {
-      const marketPlaceFees = await marketPlaceContractAsSigner.feePercent();
-      console.log("marketPlaceFees (Home)", marketPlaceFees);
+      const baseUri = await factoryContractAsSigner.getCollectionBaseUri(
+        collectionAddress
+      );
+      return Promise.resolve(baseUri);
     } catch (error) {
-      console.log(error);
+      console.log("Error when fetching token metadata : ", error);
+      return Promise.reject(error);
+    }
+  };
+
+  async function getCollectionMetadatas() {
+    try {
+      const eventFilter = factoryContractAsSigner.filters.CollectionCreated();
+      const events = await factoryContractAsSigner.queryFilter(eventFilter);
+      let allCollections: any = [];
+      for (const element of events) {
+        const collectionCid = await getCollectionCID(
+          element.args._collectionAddress
+        );
+        const metadata = await getCollection(collectionCid);
+        const collection = {
+          owner: element.args._owner,
+          address: element.args._collectionAddress,
+          description: metadata.description,
+          external_url: metadata.external_url,
+          image: metadata.image,
+          name: metadata.name,
+          items: metadata.items,
+        };
+        allCollections.push(collection);
+      }
+      return allCollections;
+    } catch (error) {
+      console.log("Error when fetching collection owner : ", error);
+      return Promise.reject(error);
     }
   }
 
   useEffect(() => {
-    if (marketPlaceContractAsSigner) {
-      console.log(marketPlaceContractAsSigner);
-      getFees();
+    if (factoryContractAsSigner) {
+      (async () => {
+        const collectionMetadatas = await getCollectionMetadatas();
+        setCollections(collectionMetadatas);
+      })();
     }
-  }, [marketPlaceContractAsSigner]);
-
-  const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
-
-  const collections = [
-    {
-      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
-      description: "Une jolie description de VTSuccessHyped10",
-      external_url:
-        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
-      image:
-        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
-      items: [{}, {}],
-      name: "VTSuccessHyped10",
-    },
-    {
-      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
-      description: "Une jolie description de VTSuccessHyped10",
-      external_url:
-        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
-      image:
-        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
-      items: [{}, {}],
-      name: "VTSuccessHyped10",
-    },
-    {
-      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
-      description: "Une jolie description de VTSuccessHyped10",
-      external_url:
-        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
-      image:
-        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
-      items: [{}, {}],
-      name: "VTSuccessHyped10",
-    },
-    {
-      owner: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-      address: "0x75537828f2ce51be7289709686A69CbFDbB714F1",
-      description: "Une jolie description de VTSuccessHyped10",
-      external_url:
-        "https://ipfs.infura.io/ipfs/QmYuUUZCCCaPHXX3Vfnz9eoFjPvHUsv8tMXp3jB5AyRrmv",
-      image:
-        "https://ipfs.infura.io/ipfs/QmPaV9jKJEaW9ipvkJr5cNtHwzxXtZmBwdxVQJDcHxsb7j",
-      items: [{}, {}],
-      name: "VTSuccessHyped10",
-    },
-  ];
+  }, [factoryContractAsSigner]);
 
   return (
     <>
@@ -118,7 +105,18 @@ export default function Home() {
                 color={"white"}
                 variant="solid"
               >
-                Create
+                Create Token
+              </Button>
+            </Link>
+
+            <Link href="/create-collection">
+              <Button
+                colorScheme={"green"}
+                bg={"green.400"}
+                color={"white"}
+                variant="solid"
+              >
+                Create Collection
               </Button>
             </Link>
           </HStack>
@@ -130,14 +128,18 @@ export default function Home() {
               modules={[Navigation]}
               className={styles.swiper}
             >
-              {collections.map((collection, index) => (
-                <SwiperSlide key={index} className={styles.swiper_slide}>
-                  <CardLg
-                    collectionInfos={collection}
-                    owner={collection.owner}
-                  ></CardLg>
-                </SwiperSlide>
-              ))}
+              {collections &&
+                collections.map((collection: any) => (
+                  <SwiperSlide
+                    key={collection.name}
+                    className={styles.swiper_slide}
+                  >
+                    <CardLg
+                      collectionInfos={collection}
+                      owner={collection.owner}
+                    ></CardLg>
+                  </SwiperSlide>
+                ))}
             </Swiper>
           </Box>
 
