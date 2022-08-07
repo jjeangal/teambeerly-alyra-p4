@@ -21,9 +21,9 @@ You can create a collection with a bunch of images (image folder) instead of cre
 Link: https://teambeerly-alyra-p4.vercel.app/
 
 #### Address of the contracts on Rinkeby:
-##### Contract NFT: 0x13F8c49aA03DCeF7D83775505bbe857916Ba7169
-##### Contract Marketplace: 0x76E16ABC630d8a95633377CD23fcF6e6eB76452a
-##### Contract Factory:  0xF1e483F3217163e59831C2f9a142f062DE02163F
+- Contract NFT: 0x13F8c49aA03DCeF7D83775505bbe857916Ba7169
+- Contract Marketplace: 0x76E16ABC630d8a95633377CD23fcF6e6eB76452a
+- Contract Factory:  0xF1e483F3217163e59831C2f9a142f062DE02163F
 
 ### After cloning this repository, install dependencies (NODE version >= 16.5.x recommended) :
 
