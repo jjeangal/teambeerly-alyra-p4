@@ -5,16 +5,13 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  HStack,
   Input,
   Tag,
   Text,
-  useNumberInput,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import {
-  ipfsGateway,
   ipfsInfura,
   uploadFileToIPFS,
   uploadFolderToIPFS,
@@ -31,20 +28,6 @@ export default function CreateCollection() {
   const [supply, setSupply] = useState(0);
 
   const [collectionIsSaving, setCollectionIsSaving] = useState(false);
-
-  // Creator earning management
-  const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-    useNumberInput({
-      step: 0.01,
-      defaultValue: 0,
-      min: 0,
-      max: 25,
-      precision: 2,
-    });
-
-  const inc = getIncrementButtonProps();
-  const dec = getDecrementButtonProps();
-  const input = getInputProps();
 
   const handleFolderSelection = (event: any) => {
     if (!!event.target.files) {
@@ -73,12 +56,16 @@ export default function CreateCollection() {
 
   const generateIPFSLinks = async (imageFile: File, imagesFolder: FileList) => {
     const urlBannerImage = await getImageIPFSUrl(imageFile);
-    const cidFolder: any = await getUriIPFS(imagesFolder);
+    const cidImagesFolder: any = await getUriIPFS(imagesFolder);
+    console.log("CID images folder : ", cidImagesFolder);
 
-    const itemsMetadatas = await generateItemsMetadata(imagesFolder, cidFolder);
+    const itemsMetadatas = await generateItemsMetadata(
+      imagesFolder,
+      cidImagesFolder
+    );
     const collectionMetadata = await generateCollectionMetadata(
       urlBannerImage,
-      cidFolder,
+      cidImagesFolder,
       itemsMetadatas
     );
 
@@ -107,14 +94,12 @@ export default function CreateCollection() {
       };
     });
 
-    const jsonFolderCIDUrl: string =
+    const cidJsonFolder: string =
       (await uploadFolderToIPFS(filesList, true)) || "";
-    console.log("cidJson ALL (URL)", jsonFolderCIDUrl);
+    console.log("CID JSON folder : ", cidJsonFolder);
 
     // TODO: Use this variable to create the collection (baseUri)
-    const jsonFolderCID: any = jsonFolderCIDUrl.split("/").pop();
-    setBaseUri(jsonFolderCID);
-    console.log("cidJson ALL", jsonFolderCID);
+    setBaseUri(cidJsonFolder);
   };
 
   const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
@@ -129,7 +114,6 @@ export default function CreateCollection() {
   const getUriIPFS = async (acceptedFile: FileList) => {
     try {
       const uri: any = await uploadFolderToIPFS(acceptedFile);
-      console.log("This is the uri: " + uri);
       return uri;
     } catch (error) {
       console.log("ipfs image upload error: ", error);
@@ -212,7 +196,7 @@ export default function CreateCollection() {
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Image Url</FormLabel>
+            <FormLabel>Banner image</FormLabel>
             <FormHelperText mb={3}>
               The banner image url for the collection.
             </FormHelperText>
