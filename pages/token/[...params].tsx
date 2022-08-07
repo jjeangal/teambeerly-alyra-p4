@@ -43,6 +43,7 @@ const tokenSellingPrice = "0.05";
 export default function Token() {
   const router = useRouter();
   const { params } = router.query;
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
   const [tokenJson, setTokenJson] = useState<TokenMetadata>();
 
@@ -71,6 +72,14 @@ export default function Token() {
   const getTokenCreateDate = (date: number): string => {
     const localDate = new Date(date).toLocaleDateString();
     return `Created the ${localDate}`;
+  };
+
+  const purchaseItem = async () => {
+    try {
+      await marketPlaceContractAsSigner.purchaseItem(params);
+    } catch (error) {
+      console.log("Error when purchasing item: ", error);
+    }
   };
 
   useEffect(() => {
