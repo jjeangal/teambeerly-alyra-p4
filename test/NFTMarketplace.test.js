@@ -40,7 +40,7 @@ describe("NFT", function () {
       expect(await nft.tokenCount()).to.equal(1);
       expect(await nft.balanceOf(addr1.address)).to.equal(1);
       expect(await nft.tokenURI(1)).to.equal(URI);
-      // // addr2
+      // // // addr2
       await nft.connect(addr2).mint(URI);
       expect(await nft.tokenCount()).to.equal(2);
       expect(await nft.balanceOf(addr2.address)).to.equal(1);
@@ -60,7 +60,7 @@ describe("NFT", function () {
       await expect(
         marketplace.connect(addr1).createMarketItem(nft.address, toWei(1))
       )
-        .to.emit(marketplace, "Offered")
+        .to.emit(marketplace, "MarketItemCreated")
         .withArgs(1, nft.address, 1, toWei(1), addr1.address);
 
       //Should trasnfer NFT from seller to marketplace
@@ -68,7 +68,7 @@ describe("NFT", function () {
       expect(await marketplace._tokenIds()).to.equal(1);
 
       //Should store the NFT in the struct Item with the right values
-      const item = await marketplace.items(1);
+      const item = await marketplace.idToItem(1);
       expect(item.nft).to.equal(nft.address);
       expect(item.tokenId).to.equal(1);
       expect(item.price).to.equal(toWei(1));
@@ -105,15 +105,8 @@ describe("NFT", function () {
       await expect(
         marketplace.connect(addr2).purchaseItem(1, { value: totalPriceInWei })
       )
-        .to.emit(marketplace, "Bought")
-        .withArgs(
-          1,
-          nft.address,
-          1,
-          toWei(price),
-          addr1.address,
-          addr2.address
-        );
+        .to.emit(marketplace, "MarketItemBought")
+        .withArgs(nft.address, 1, toWei(price), addr1.address, addr2.address);
 
       const sellerFinalEthBal = await addr1.getBalance();
       const feeAccountFinalEthBal = await deployer.getBalance();
@@ -129,7 +122,7 @@ describe("NFT", function () {
       //The buyer should own the NFT
       expect(await nft.ownerOf(1)).to.equal(addr2.address);
       // Item should me marked as sold
-      expect((await marketplace.items(1)).sold).to.equal(true);
+      expect((await marketplace.idToItem(1)).sold).to.equal(true);
     });
 
     it("Should revert by invalid item id, not sending enough money and sold item", async () => {
@@ -158,7 +151,7 @@ describe("NFT", function () {
         marketplace
           .connect(deployer)
           .purchaseItem(1, { value: totalPriceInWei })
-      ).to.be.revertedWith("item already sold");
+      ).to.be.revertedWith("item doesn't exist");
     });
   });
 });

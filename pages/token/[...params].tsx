@@ -17,10 +17,13 @@ import {
   Center,
   Spinner,
 } from "@chakra-ui/react";
+import { ethers } from "ethers";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
 import Layout from "../../components/Layout/Layout";
 import { networkCurrency } from "../../context/constants";
+import { MarketPlaceContext } from "../../context/MarketPlaceContext";
 import { stripAddress } from "../../services/utils";
 
 type TokenMetadata = {
@@ -38,14 +41,22 @@ const IPFSUrl = "https://cf-ipfs.com/ipfs";
 
 // TODO: Fetch infos from the contract
 const owner = "0x3D590DFe57886728810819feFbb9219f4A847c0d";
-const tokenSellingPrice = "0.05";
 
 export default function Token() {
   const router = useRouter();
   const { params } = router.query;
-  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner, blyTokenContractAsSigner } =
+    useContext(MarketPlaceContext);
+  const [sucessPayment, setSucessPayment] = useState(false);
 
   const [tokenJson, setTokenJson] = useState<TokenMetadata>();
+
+  let tokenSellingPrice;
+
+  const setTokenSellingPrice = async () => {
+    tokenSellingPrice = await marketPlaceContractAsSigner.getTotalPrice(params);
+  };
+  setTokenSellingPrice();
 
   const getToken = async function (params: any) {
     const collectionCIDJson = params[0];
@@ -74,9 +85,17 @@ export default function Token() {
     return `Created the ${localDate}`;
   };
 
-  const purchaseItem = async () => {
+  const buyNFT = async () => {
     try {
-      await marketPlaceContractAsSigner.purchaseItem(params);
+      const price = ethers.utils.parseUnits(
+        blyTokenContractAsSigner.price.toString(),
+        "ether"
+      );
+      const transaction = await marketPlaceContractAsSigner.purchaseItem(
+        params,
+        { value: price }
+      );
+      await transaction.wait();
     } catch (error) {
       console.log("Error when purchasing item: ", error);
     }

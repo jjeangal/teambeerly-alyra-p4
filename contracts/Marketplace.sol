@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-
 /// @title OpenBatch Marketplace contract
 /// @author Antoine Servant at OpenBatch
 /// @notice This contract is used to interract with NFT's in the Marketplace
@@ -50,14 +49,14 @@ contract Marketplace is ReentrancyGuard {
     );
 
     ///@dev Set feeAccount to the contract creator _feePercent choice
-    ///@param _feePercent
+    ///@param _feePercent fee of the marketplace at sell
     constructor(uint256 _feePercent) {
         feeAccount = payable(msg.sender);
         feePercent = _feePercent;
     }
 
     ///@dev view function to get the total price of an NFT
-    ///@param _itemId
+    ///@param _itemId the ID of the NFT
     ///@return totalPrice
     function getTotalPrice(uint256 _itemId) public view returns (uint256) {
         return ((idToItem[_itemId].price * (100 + feePercent)) / 100);
@@ -90,7 +89,7 @@ contract Marketplace is ReentrancyGuard {
 
     ///@notice Function to purchase NFT
     ///@dev get total price, pay seller and feeAccount, transfer NFT and delete the item on the mapping
-    ///@param _itemId
+    ///@param _itemId the ID of the NFT
     function purchaseItem(uint256 _itemId) external payable nonReentrant {
         //require price must be equal or greater than totalPrice
         uint256 _totalPrice = getTotalPrice(_itemId);
@@ -170,6 +169,5 @@ contract Marketplace is ReentrancyGuard {
             }
         }
         return items;
-
     }
 }
