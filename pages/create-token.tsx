@@ -1,10 +1,5 @@
 import { useState, useContext, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useDropzone } from "react-dropzone";
-import { create } from "ipfs-http-client";
-import { MarketPlaceContext } from "../context/MarketPlaceContext";
-
-import Layout from "../components/Layout/Layout";
 import {
   Box,
   Button,
@@ -17,31 +12,28 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import { MarketPlaceContext } from "../context/MarketPlaceContext";
+
+import Layout from "../components/Layout/Layout";
+
+import {
+  ipfsInfura,
+  uploadFileToIPFS,
+  uploadFolderToIPFS,
+} from "../services/ipfs.service";
+
 //Create IPFS clients
 const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
 const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
-const auth =
-  "Basic " + Buffer.from(projectId + ":" + projectSecret).toString("base64");
-
-const client = create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-  headers: {
-    authorization: auth,
-  },
-});
 
 export default function CreateToken() {
   //Form input
   const [fileUrl, setFileUrl] = useState("");
+  const [image, setImage] = useState<File>();
   const [formInput, setFormInput] = useState({
-    image: "",
     name: "",
     description: "",
   });
-
-  let ipfsUrlc;
 
   //Get contracts
   const {
@@ -49,62 +41,27 @@ export default function CreateToken() {
     blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
-  /* Get the dropped Image */
-  //Function triggered on image drop
-  const onDrop = useCallback(async (acceptedFile: any) => {
-    try {
-      const url: any = await uploadToIPFS(acceptedFile[0]);
-      setFileUrl(url);
-    } catch (error) {
-      console.log("ipfs image upload error: ", error);
-    }
-  }, []);
-
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
-    onDrop,
-    accept: {
-      "image/*": [".gif"],
-    },
-    maxSize: 5000000,
-  });
-
-  const uploadToIPFS = async (file: any) => {
-    try {
-      const added = await client.add(file);
-      const url = `https://openbatch.infura-ipfs.io/ipfs/${added.path}`;
-      return url;
-    } catch (error) {
-      console.log("Error when uploading file to IPFS:", error);
-    }
-  };
-
   const createNFT = async () => {
-    const { image, name, description } = formInput;
+    const { name, description } = formInput;
     if (!image || !name || !description) return;
     try {
-      const result = await client.add(
-        JSON.stringify({ image, name, description })
+      const imageUrl = await uploadFileToIPFS(image);
+      console.log(image);
+      const form = { imageUrl, name, description };
+      const jsonFileCollection = new File(
+        [JSON.stringify(form)],
+        `_metadata.json`,
+        { type: "application/json" }
       );
-      const added = await client.add(result);
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`;
-      console.log("IPFS: ", url);
-      const tokenCreation = await erc721Contract.mint(url);
+      const transaction = await uploadFileToIPFS(jsonFileCollection);
+      console.log(transaction);
+
+      const tokenCreation = await erc721ContractAsSigner.mint(transaction);
       await tokenCreation.wait();
       console.log("token created");
     } catch (error) {
-      console.log("ipfs uri upload error: ", error);
+      console.log("Error on mint NFT: ", error);
     }
-  };
-
-  const verify = () => {
-    console.log(fileUrl);
-    console.log(client);
   };
 
   return (
@@ -113,14 +70,15 @@ export default function CreateToken() {
         <Text fontSize={"3xl"} fontWeight={"bold"}>
           Create New NFT
         </Text>
-        {/* Need to change this to an upload image form */}
-        <Box mt={"2em"} w={"full"} {...getRootProps()}>
+        <Box mt={"2em"} w={"full"}>
           <FormControl isRequired>
-            <FormLabel>Click here to upload an Image</FormLabel>
+            <FormLabel>Image</FormLabel>
             <Input
-              onChange={(e) =>
-                setFormInput({ ...formInput, image: e.target.value })
-              }
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={(e) => {
+                if (e.target.files != null) setImage(e.target.files[0]);
+              }}
             />
           </FormControl>
         </Box>
@@ -174,20 +132,16 @@ export default function CreateToken() {
           </FormControl>
         </Box>
         {/* Need to change to a search user's collection form (with none) */}
-        <Box mt={"2em"} w={"full"}>
+        {/* <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Description</FormLabel>
+            <FormLabel>Collection</FormLabel>
             <FormHelperText mb={3}>
               If you want to put the NFT on on of your collection:
             </FormHelperText>
             <Input type="text" />
           </FormControl>
-        </Box>
+        </Box> */}
         <Box mt={"3em"} w={"full"} onClick={createNFT}>
-          <Button>create</Button>
-        </Box>
-        {/* Button for dev */}
-        <Box mt={"3em"} w={"full"} onClick={verify}>
           <Button>create</Button>
         </Box>
       </Container>

@@ -117,6 +117,7 @@ export default function SellToken() {
                     </Box>
                     <Box mt={"2em"} w={"full"}>
                       <Button
+                        onClick={sellItem}
                         colorScheme={"purple"}
                         bg={"purple.800"}
                         color={"white"}

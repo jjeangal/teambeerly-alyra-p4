@@ -139,6 +139,7 @@ export default function Token() {
                   Price : {tokenSellingPrice + " " + networkCurrency}
                 </Text>
                 <Button
+                  onClick={buyNFT}
                   colorScheme={"purple"}
                   w={"80px"}
                   h={"45px"}
