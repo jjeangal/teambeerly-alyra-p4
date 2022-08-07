@@ -10,6 +10,7 @@ import {
   FormLabel,
   Input,
   Text,
+  Select,
 } from "@chakra-ui/react";
 
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
@@ -21,12 +22,16 @@ import {
   uploadFileToIPFS,
   uploadFolderToIPFS,
 } from "../services/ipfs.service";
+import { factoryAddress } from "../context/constants";
+import { useAddress } from "@thirdweb-dev/react";
 
 //Create IPFS clients
 const projectId = "2CvlZnTIlpRtyaWCJEp0aVOPPUg";
 const projectSecret = "ac0b1ae7fcabb8bb3972d9fd04d92ae5";
 
 export default function CreateToken() {
+  const address = useAddress() || "";
+
   //Form input
   const [fileUrl, setFileUrl] = useState("");
   const [image, setImage] = useState<File>();
@@ -36,8 +41,25 @@ export default function CreateToken() {
   });
 
   //Get contracts
-  const { marketPlaceContractAsSigner, blyTokenContractAsSigner } =
+  const { factoryContractAsSigner, blyTokenContractAsSigner } =
     useContext(MarketPlaceContext);
+
+  const getAllCollections = async (currentAdress: string) => {
+    try {
+      const eventFilter = factoryContractAsSigner.filters.CollectionCreated();
+      const events = await factoryContractAsSigner.queryFilter(eventFilter);
+      const allCollections: any[] = [];
+      events.forEach((element: any) => {
+        if (element.args._owner == currentAdress) {
+          allCollections.push(element.args._collectionAddress);
+        }
+      });
+      return Promise.resolve(allCollections);
+    } catch (error) {
+      console.log("Error when fetching collection owner : ", error);
+      return Promise.reject(error);
+    }
+  };
 
   const createNFT = async () => {
     const { name, description } = formInput;
@@ -61,6 +83,15 @@ export default function CreateToken() {
       console.log("Error on mint NFT: ", error);
     }
   };
+
+  useEffect(() => {
+    if (factoryContractAsSigner && address) {
+      (async () => {
+        const collectionsAddresses = await getAllCollections(address);
+        console.log("collectionsAddresses", collectionsAddresses);
+      })();
+    }
+  }, [factoryContractAsSigner, address]);
 
   return (
     <Layout>
@@ -106,16 +137,12 @@ export default function CreateToken() {
             />
           </FormControl>
         </Box>
-        <Box mt={"2em"} w={"full"}></Box>
-        {/* Need to change to a search user's collection form (with none) */}
         <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Choose a collection</FormLabel>
-            <FormHelperText mb={3}>
-              If you want to put the NFT on on of your collection:
-            </FormHelperText>
-            <Input type="text" />
-          </FormControl>
+          <Select placeholder="Select option">
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+          </Select>
         </Box>
         <Box mt={"3em"} w={"full"} onClick={createNFT}>
           <Button>create</Button>
