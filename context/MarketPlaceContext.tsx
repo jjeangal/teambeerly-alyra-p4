@@ -1,9 +1,5 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { Contract, ethers } from "ethers";
-import Web3Modal from "web3modal";
-import axios from "axios";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
-
 import {
   marketplaceAddress,
   marketplaceAddressAbi,
