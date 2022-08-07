@@ -72,6 +72,15 @@ export default function SellToken() {
       })();
     }
   }, [params]);
+  4;
+
+  const sellItem = async () => {
+    try {
+      await marketPlaceContractAsSigner.createMarketItem("eer", price);
+    } catch (error) {
+      console.log("Error when selling item: ", error);
+    }
+  };
 
   return (
     <>
