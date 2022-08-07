@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Badge,
   Box,
   Button,
   HStack,
@@ -9,33 +10,50 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { chakra } from "@chakra-ui/react";
+import { getAvatar, stripAddress } from "../../services/utils";
 
 interface CardProps {
-  imageUrl?: string;
+  collectionInfos: any;
+  owner?: string;
   avatar?: string;
   viewOwner?: boolean;
 }
 
 export default function CardLg({
-  imageUrl,
-  avatar,
+  collectionInfos,
+  owner,
   viewOwner = true,
 }: CardProps) {
   return (
-    <Box w="385px" bg="white" shadow="lg" rounded="lg" overflow="hidden">
+    <Box
+      w="385px"
+      bg="white"
+      shadow="lg"
+      rounded="lg"
+      overflow="hidden"
+      position={"relative"}
+    >
+      <Badge
+        position={"absolute"}
+        top={"5px"}
+        right={"5px"}
+        borderRadius={"lg"}
+      >
+        {collectionInfos.items?.length} items
+      </Badge>
       <Image
         w="full"
         h={"350px"}
         fit="cover"
-        src={imageUrl}
+        src={collectionInfos.image}
         alt="item"
         fallback={<Skeleton h={"350px"} />}
       />
 
       <HStack p={5} spacing={5}>
-        {avatar && (
+        {owner && (
           <Box>
-            <Avatar name="NC" src={avatar} />
+            <Avatar name="NC" src={getAvatar(owner)} />
           </Box>
         )}
         <Box textAlign="left">
@@ -44,20 +62,24 @@ export default function CardLg({
             fontSize="2xl"
             color="gray.800"
             fontWeight="bold"
+            maxW={"190px"}
+            textOverflow={"ellipsis"}
+            overflowX={"hidden"}
+            whiteSpace={"nowrap"}
           >
-            Colorz
+            {collectionInfos.name || "Colorz"}
           </Text>
           {viewOwner && (
             <chakra.span fontSize="sm" color="gray.700">
-              by Zoonies
+              by {owner ? stripAddress(owner) : "Zoonies"}
             </chakra.span>
           )}
         </Box>
 
-        {/* TODO: Add link to /collection with the ID */}
         <Link
-          href="/"
+          href={`/collection/${collectionInfos.address}`}
           alignSelf={"center"}
+          textAlign={"right"}
           flexGrow={"2"}
           _hover={{
             textDecoration: "none",
