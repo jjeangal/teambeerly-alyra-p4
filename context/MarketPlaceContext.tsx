@@ -7,8 +7,8 @@ import { ThirdwebProvider } from "@thirdweb-dev/react";
 import {
   marketplaceAddress,
   marketplaceAddressAbi,
-  erc721Address,
-  erc721AddressAbi,
+  blyTokenAddress,
+  blyTokenAddressAbi,
   networkCurrency,
 } from "./constants";
 
@@ -72,15 +72,15 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
     setMarketPlaceContractAsSigner(_marketPlaceContractAsSigner);
 
     const _erc721Contract = new ethers.Contract(
-      erc721Address,
-      erc721AddressAbi,
+      blyTokenAddress,
+      blyTokenAddressAbi,
       provider
     );
     setErc721Contract(_erc721Contract);
 
     const _erc721ContractAsSigner = new ethers.Contract(
-      erc721Address,
-      erc721AddressAbi,
+      blyTokenAddress,
+      blyTokenAddressAbi,
       provider.getSigner()
     );
     setErc721ContractAsSigner(_erc721ContractAsSigner);

@@ -1,11 +1,11 @@
-import erc721JSon from "./BlyToken.json";
+import blyJSon from "./BlyToken.json";
 import marketplaceJSon from "./Marketplace.json";
 import factoryJSon from "./NFTFactory.json";
 import { ChainId } from "@thirdweb-dev/sdk";
 
-//For NFT contract
-export const erc721Address = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
-export const erc721AddressAbi = erc721JSon.abi;
+//For BLY contract
+export const blyTokenAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+export const blyTokenAddressAbi = blyJSon.abi;
 
 //For Marketplace contract
 export const marketplaceAddress = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
