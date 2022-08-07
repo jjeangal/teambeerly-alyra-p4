@@ -16,6 +16,7 @@ import { useAddress, useSigner } from "@thirdweb-dev/react";
 import { ethers } from "ethers";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
+import CardItem from "../components/cards/Card-item";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
@@ -27,7 +28,7 @@ export default function Profile() {
   const signer = useSigner();
   const [balance, setBalance] = useState("");
   const [listedItems, setListedItems] = useState();
-  const [collections, setCollections] = useState<any[]>([]);
+  const [allItems, setAllItems] = useState<any[]>([]);
   const { hasCopied, onCopy } = useClipboard(address);
 
   const { factoryContractAsSigner } = useContext(MarketPlaceContext);
@@ -84,29 +85,44 @@ export default function Profile() {
   const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
   const getAccountItemsOnMarketplace = async () => {
-    const items = await marketPlaceContractAsSigner.fetchSales();
+    const items = await marketPlaceContractAsSigner.fetchSales(address);
+    console.log("getAccountItemsOnMarketplace", items);
     setListedItems(items);
   };
 
   useEffect(() => {
     if (signer) {
       (async () => {
+        // Get balance
         const walletBalance = await signer.getBalance();
         const currentBalance = ethers.utils.formatEther(walletBalance);
         setBalance(currentBalance.substring(0, 6));
-        const ownerCollections = await getOwnerCollections(address);
 
+        // Get collections addresses
+        const ownerCollections = await getOwnerCollections(address);
         console.log("ownerCollections", ownerCollections);
+
+        // Get collections CID
         const allJsonCIDs = await getOwnerCollectionsMetaData(ownerCollections);
         console.log("allJsonCIDs", allJsonCIDs);
-        const allCollections = await getOwnerCollectionsJson(allJsonCIDs);
-        console.log("allCollections", allCollections);
 
-        allCollections.map((col, index) => {
-          col.address = ownerCollections[index];
-          return col;
+        // Get collections Metadatas
+        const allCollections = await getOwnerCollectionsJson(allJsonCIDs);
+
+        const _allItems: any[] = [];
+        allCollections.forEach((col, collectionIndex) => {
+          col.items.forEach((item: any, itemIndex: number) => {
+            item.collectionAddress = ownerCollections[collectionIndex];
+            item.collectionName = col.name;
+            item.collectionCID = allJsonCIDs[collectionIndex];
+            item.index = itemIndex;
+            _allItems.push(item);
+          });
         });
-        setCollections(allCollections);
+        console.log("_allItems", _allItems);
+        setAllItems(_allItems);
+
+        await getAccountItemsOnMarketplace();
       })();
     }
   }, [signer]);
@@ -142,8 +158,8 @@ export default function Profile() {
             </HStack>
             <Box mt={"2em"}>
               <Text fontSize={"16px"}>
-                {collections.length + " "}
-                collection(s)
+                {allItems.length + " "}
+                items(s)
               </Text>
             </Box>
             <Box mt={"2em"}>
@@ -164,7 +180,7 @@ export default function Profile() {
             </Box>
           </Container>
 
-          {collections.length > 0 && (
+          {allItems.length > 0 && (
             <Flex
               columnGap={"2em"}
               rowGap={"3em"}
@@ -172,12 +188,8 @@ export default function Profile() {
               flexWrap={"wrap"}
               justifyContent={"center"}
             >
-              {collections.map((collection, index) => (
-                <CardLg
-                  collectionInfos={collection}
-                  key={index}
-                  viewOwner={false}
-                ></CardLg>
+              {allItems.map((item: any, itemIndex: number) => (
+                <CardItem key={itemIndex} itemInfos={item}></CardItem>
               ))}
             </Flex>
           )}
