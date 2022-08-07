@@ -1,13 +1,36 @@
-# Sample Hardhat Project
+# OpenBatch
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+OpenBatch is a clone of OpenSea marketplace where you can create, and sell your NFTs collections.
 
-Try running some of the following tasks:
+👉 Production site is actually on **Rinkeby** network.
+
+## What is different from OpenSea ?
+
+You can create a collection with a bunch of images (image folder) instead of create one by one.
+
+## Features
+
+-   Explore NFTs collections
+-   Create your collections, or a single item with direct listing
+-   Buy any NFT listed on the plateform
+-   Allow connection with multiple wallets like MetaMask, CoinBase, and WalletConnect
+
+## Getting started
+
+After clone this repository, install dependencies (NODE version >= 16.5.x recommended) :
+
+```sh
+$ npm i
+```
+
+You have to create a `.env.local` file like the [./.env.sample](./.env.sample) as example. You'll need a Infura account and a Rinkeby wallet address.
+
+Then you can run these scripts :
 
 ```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+npm run start:h => Run hardhat node
+npm run deploy:local or npm run deploy:rinkeby => Deploy contracts on local blockchain or in the Rinkeby network
+npm run dev => Run Nextjs serveur (watch mode)
 ```
+
+Select the right network (local RPC or Rinkeby) in your wallet settings, and you can load the local site. (Be sure to have funds in order to make transactions with the plateform)

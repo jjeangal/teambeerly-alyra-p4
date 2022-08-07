@@ -1,13 +1,6 @@
 import { createAvatar } from "@dicebear/avatars";
 import * as style from "@dicebear/avatars-identicon-sprites";
 
-// Use this with local IPFS Node
-// const ipfsGateway = "http://127.0.0.1:8080/ipfs";
-const ipfsGateway = "https://cf-ipfs.com/ipfs";
-
-// The CID will be different for each collection
-const ipfsCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
-
 const getAvatar = function (seed: string): string {
     return createAvatar(style, {
         seed,
@@ -23,8 +16,4 @@ const stripAddress = function (address: string) {
     return `${beginning}...${end}`;
 };
 
-const getImageUrl = function (imageUrl: string): string {
-    return `${ipfsGateway}/${ipfsCID}/${imageUrl}`;
-};
-
-export { getAvatar, stripAddress, getImageUrl };
+export { getAvatar, stripAddress };

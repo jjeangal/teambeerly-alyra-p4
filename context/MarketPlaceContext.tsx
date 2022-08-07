@@ -1,30 +1,32 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
 import { Contract, ethers } from "ethers";
-import Web3Modal from "web3modal";
-import axios from "axios";
-import { ThirdwebProvider } from "@thirdweb-dev/react";
-
 import {
   marketplaceAddress,
   marketplaceAddressAbi,
-  erc721Address,
-  erc721AddressAbi,
+  blyTokenAddress,
+  blyTokenAddressAbi,
+  factoryAddress,
+  factoryAddressAbi,
   networkCurrency,
 } from "./constants";
 
 type MarketPlaceContextValues = {
   marketPlaceContract: any;
   marketPlaceContractAsSigner: any;
-  erc721Contract: any;
-  erc721ContractAsSigner: any;
+  blyTokenContract: any;
+  blyTokenContractAsSigner: any;
+  factoryContract: any;
+  factoryContractAsSigner: any;
   networkCurrency: string;
 };
 
 export const MarketPlaceContext = createContext<MarketPlaceContextValues>({
   marketPlaceContract: {} as Contract,
   marketPlaceContractAsSigner: {} as Contract,
-  erc721Contract: {} as Contract,
-  erc721ContractAsSigner: {} as Contract,
+  blyTokenContract: {} as Contract,
+  blyTokenContractAsSigner: {} as Contract,
+  factoryContract: {} as Contract,
+  factoryContractAsSigner: {} as Contract,
   networkCurrency,
 });
 
@@ -32,8 +34,13 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
   const [marketPlaceContract, setMarketPlaceContract] = useState<Contract>();
   const [marketPlaceContractAsSigner, setMarketPlaceContractAsSigner] =
     useState<Contract>();
+
   const [erc721Contract, setErc721Contract] = useState<Contract>();
   const [erc721ContractAsSigner, setErc721ContractAsSigner] =
+    useState<Contract>();
+
+  const [factoryContract, setFactoryContract] = useState<Contract>();
+  const [factoryContractAsSigner, setFactoryContractAsSigner] =
     useState<Contract>();
 
   useEffect(() => {
@@ -70,19 +77,33 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
     );
     setMarketPlaceContractAsSigner(_marketPlaceContractAsSigner);
 
-    const _erc721Contract = new ethers.Contract(
-      erc721Address,
-      erc721AddressAbi,
+    const _blyTokenContract = new ethers.Contract(
+      blyTokenAddress,
+      blyTokenAddressAbi,
       provider
     );
-    setErc721Contract(_erc721Contract);
+    setErc721Contract(_blyTokenContract);
 
-    const _erc721ContractAsSigner = new ethers.Contract(
-      erc721Address,
-      erc721AddressAbi,
+    const _blyTokenContractAsSigner = new ethers.Contract(
+      blyTokenAddress,
+      blyTokenAddressAbi,
       provider.getSigner()
     );
-    setErc721ContractAsSigner(_erc721ContractAsSigner);
+    setErc721ContractAsSigner(_blyTokenContractAsSigner);
+
+    const _factoryContract = new ethers.Contract(
+      factoryAddress,
+      factoryAddressAbi,
+      provider
+    );
+    setFactoryContract(_factoryContract);
+
+    const _factoryContractAsSigner = new ethers.Contract(
+      factoryAddress,
+      factoryAddressAbi,
+      provider.getSigner()
+    );
+    setFactoryContractAsSigner(_factoryContractAsSigner);
   }, []);
 
   return (
@@ -90,8 +111,10 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
       value={{
         marketPlaceContract,
         marketPlaceContractAsSigner,
-        erc721Contract,
-        erc721ContractAsSigner,
+        blyTokenContract: erc721Contract,
+        blyTokenContractAsSigner: erc721ContractAsSigner,
+        factoryContract,
+        factoryContractAsSigner,
         networkCurrency,
       }}
     >
@@ -99,53 +122,3 @@ export const MarketPlaceProvider = ({ children }: { children: ReactNode }) => {
     </MarketPlaceContext.Provider>
   );
 };
-
-// TODO: Put this code into a service in order to call function from
-// everywhere we want after app loaded
-
-//Principal function
-// export const NFTProvider = ({ children }) => {
-
-//URL to stock the data on IPFS
-// const client = ipfsHttpsClient("https:/ifps.infura.io:5001/api/v0");
-
-//   const uploadToIPFS = async (file, setFileUrl) => {
-//     try {
-//       const added = await client.add({ content: file });
-//       const uri = `https://ipfs.infura.io/ipfs/${added.path}`;
-
-//       return uri;
-//     } catch (error) {
-//       console.log("Error when uploading file to IPFS");
-//     }
-//   };
-
-//   const createNFT = async (formInput, fileUrl, router) => {
-//     const { name, description, price } = formInput;
-
-//     if (!name || !description || !price || !fileUrl) return;
-//     try {
-//       const data = JSON.stringify({ name, description, image: fileUrl });
-//       const added = await client.add(data);
-
-//       await createSale(url, price);
-//       router.push("/");
-//     } catch (error) {
-//       console.log("Error when creating NFT");
-//     }
-//   };
-
-//   const createSale = async (inputPrice, id) => {
-//     const uri = `https://ipfs.infura.io/ipfs/${added.path}`;
-
-//     //mint NFT
-//     await (await nft.mint(uri)).wait();
-
-//     //get ID
-//     const tokenId = await nft.tokenId();
-//     const price = ethers.utils.parseUnits(inputPrice, "ether");
-
-//     const transaction = await nft.mint;
-//   };
-
-// };

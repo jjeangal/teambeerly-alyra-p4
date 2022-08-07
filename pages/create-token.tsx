@@ -47,15 +47,15 @@ export default function CreateToken() {
   const {
     marketPlaceContract,
     marketPlaceContractAsSigner,
-    erc721Contract,
-    erc721ContractAsSigner,
+    blyTokenContract: erc721Contract,
+    blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
   /* Get the dropped Image */
   //Function triggered on image drop
-  const onDrop = useCallback(async (acceptedFile) => {
+  const onDrop = useCallback(async (acceptedFile: any) => {
     try {
-      const url = await uploadToIPFS(acceptedFile[0]);
+      const url: any = await uploadToIPFS(acceptedFile[0]);
       setFileUrl(url);
     } catch (error) {
       console.log("ipfs image upload error: ", error);
@@ -76,7 +76,7 @@ export default function CreateToken() {
     maxSize: 5000000,
   });
 
-  const uploadToIPFS = async (file) => {
+  const uploadToIPFS = async (file: any) => {
     try {
       const added = await client.add(file);
       const url = `https://openbatch.infura-ipfs.io/ipfs/${added.path}`;

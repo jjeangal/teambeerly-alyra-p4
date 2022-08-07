@@ -5,91 +5,195 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  HStack,
   Input,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Radio,
-  RadioGroup,
-  Stack,
+  Tag,
   Text,
-  useNumberInput,
 } from "@chakra-ui/react";
-import React, { useContext, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import React, { useContext, useState } from "react";
 import Layout from "../components/Layout/Layout";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
+import {
+  ipfsInfura,
+  uploadFileToIPFS,
+  uploadFolderToIPFS,
+} from "../services/ipfs.service";
 
 export default function CreateCollection() {
-  const { marketPlaceContract } = useContext(MarketPlaceContext);
+  const router = useRouter();
 
-  async function getFees() {
-    try {
-      const marketPlaceFees = await marketPlaceContract.feePercent();
-      console.log("marketPlaceFees (CreateCollection)", marketPlaceFees);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    if (marketPlaceContract) {
-      getFees();
-    }
-  }, [marketPlaceContract]);
-
-  // Creator earning management
-  const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-    useNumberInput({
-      step: 0.01,
-      defaultValue: 0,
-      min: 0,
-      max: 25,
-      precision: 2,
-    });
-
-  const inc = getIncrementButtonProps();
-  const dec = getDecrementButtonProps();
-  const input = getInputProps();
+  const { factoryContractAsSigner } = useContext(MarketPlaceContext);
 
   // Contract type management
-  const [contractType, setContractType] = useState("ERC721");
-
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [description, setDescription] = useState("");
-  const [baseUri, setBaseUri] = useState("");
+  const [imageFile, setImageFile] = useState<File>();
+  const [imagesFolder, setImagesFolder] = useState<FileList>();
   const [supply, setSupply] = useState(0);
 
-  function createCollection() {
+  const [collectionIsSaving, setCollectionIsSaving] = useState(false);
+
+  const handleFolderSelection = (event: any) => {
+    if (!!event.target.files) {
+      setImagesFolder(event.target.files);
+      setSupply(event.target.files.length);
+    }
+  };
+
+  async function createCollection() {
     if (name.length == 0) return alert("Name field is empty.");
     if (symbol.length == 0) return alert("Symbol field is empty.");
-    if (description.length == 0) alert("Description field is empty.");
-    if (baseUri.length == 0) alert("Uri field is empty.");
-    if (supply <= 0) alert("Supply must be higher than 0.");
+    if (description.length == 0) return alert("Description field is empty.");
+    if (!imageFile) return alert("Choose a collection image.");
+    if (!imagesFolder) return alert("Choose images for collection nfts.");
+    if (supply <= 0) return alert("Supply must be higher than 0.");
 
-    generateIpfsLinks();
-    generateMetaData();
+    // 1) création du dossier d'images, avec les images dedans dans IPFS => OK
+    // 2) création du metadata de chaque item, avec push sur IPFS => OK
+    // 3) création du metadata de la collection à partir du résultat (info collection + infos de tous les items) => OK
+    // 4) création des interactions avec le contracts => OK
+    // 5) redirection vers la page collection view
+
+    setCollectionIsSaving(true);
+    await generateIPFSLinks(imageFile, imagesFolder);
+    setCollectionIsSaving(false);
   }
 
-  function generateIpfsLinks() {
-    console.log("Generate folder link to IPFS");
-    console.log("Generate image link to IPFS");
-  }
+  const generateIPFSLinks = async (imageFile: File, imagesFolder: FileList) => {
+    const urlBannerImage = await getImageIPFSUrl(imageFile);
+    const cidImagesFolder: any = await getUriIPFS(imagesFolder);
+    console.log("CID images folder : ", cidImagesFolder);
 
-  function generateMetaData() {
-    const metadata = {
-      name: name,
-      description: description,
-      image:
-        "https://ipfs.io/ipfs/QmUnMkaEB5FBMDhjPsEtLyHr4ShSAoHUrwqVryCeuMosNr",
-      external_url: baseUri,
+    const itemsMetadatas = await generateItemsMetadata(
+      imagesFolder,
+      cidImagesFolder
+    );
+    const collectionMetadata = await generateCollectionMetadata(
+      urlBannerImage,
+      cidImagesFolder,
+      itemsMetadatas
+    );
+
+    const jsonFileCollection = new File(
+      [JSON.stringify(collectionMetadata)],
+      `_metadata.json`,
+      { type: "application/json" }
+    );
+
+    let filesList: any = [
+      {
+        path: `_metadata.json`,
+        content: jsonFileCollection,
+      },
+    ];
+
+    itemsMetadatas.forEach(async (itemsMetadata, index) => {
+      const jsonFileItem = new File(
+        [JSON.stringify(itemsMetadata)],
+        `${index}.json`,
+        { type: "application/json" }
+      );
+      filesList[index + 1] = {
+        path: `${index}.json`,
+        content: jsonFileItem,
+      };
+    });
+
+    const cidJsonFolder: string =
+      (await uploadFolderToIPFS(filesList, true)) || "";
+    console.log("CID JSON folder : ", cidJsonFolder);
+
+    await createCollectionFromContract(urlBannerImage, cidJsonFolder);
+  };
+
+  const createCollectionFromContract = async (
+    urlBannerImage: string,
+    collectionBaseUri: string
+  ) => {
+    const options = {
+      name,
+      symbol,
+      collectionBaseUri,
+      urlBannerImage,
+      supply,
     };
-    console.log(metadata);
-    return metadata;
-  }
+    console.log(
+      "🔎 ~ file: create-collection.tsx ~ line 115 ~ createCollectionFromContract ~ options",
+      options
+    );
+    try {
+      const tx = await factoryContractAsSigner.createCollection(
+        name,
+        symbol,
+        collectionBaseUri,
+        urlBannerImage,
+        supply
+      );
+      const txReceipt = await tx.wait();
+
+      console.log("txReceipt : ", txReceipt);
+
+      const event = txReceipt.events.find(
+        (event: any) => event.event === "CollectionCreated"
+      );
+      const newCollectionAddress = event.args._collectionAddress;
+      console.log("newCollectionAddress", newCollectionAddress);
+      router.push(`/collection/${collectionBaseUri}`);
+    } catch (error) {}
+  };
+
+  const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
+    try {
+      const url: string = await uploadFileToIPFS(acceptedFile);
+      return Promise.resolve(url);
+    } catch (error) {
+      console.log("ipfs image upload error: ", error);
+    }
+  };
+
+  const getUriIPFS = async (acceptedFile: FileList) => {
+    try {
+      const uri: any = await uploadFolderToIPFS(acceptedFile);
+      return uri;
+    } catch (error) {
+      console.log("ipfs image upload error: ", error);
+    }
+  };
+
+  const generateItemsMetadata = async (
+    acceptedFile: FileList,
+    cidFolder: string
+  ) => {
+    const filesMetadata = [];
+    for (let i = 0; i < acceptedFile.length; i++) {
+      let file: any = acceptedFile.item(i);
+
+      const metadata = {
+        name: `${name} #${i}`,
+        description: `Welcome to the home of ${name} on OpenBatch. Discover the best items in this collection.`,
+        image: `${ipfsInfura}/${cidFolder}/${file.name}`,
+        date: new Date().toJSON(),
+      };
+      filesMetadata.push(metadata);
+    }
+    return filesMetadata;
+  };
+
+  const generateCollectionMetadata = async (
+    urlBannerImage: string,
+    cidFolder: string,
+    itemsMetadatas: any[]
+  ) => {
+    const result = {
+      name,
+      description,
+      image: urlBannerImage,
+      external_url: `${ipfsInfura}/${cidFolder}`,
+      items: itemsMetadatas,
+    };
+    return result;
+  };
 
   return (
     <Layout>
@@ -133,79 +237,52 @@ export default function CreateCollection() {
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Image Url</FormLabel>
+            <FormLabel>Banner image</FormLabel>
             <FormHelperText mb={3}>
               The banner image url for the collection.
             </FormHelperText>
             <Input
-              type="text"
-              /**value={}
-              onChange={}*/
+              type="file"
+              accept="image/png, image/jpeg"
+              onChange={(e) => {
+                if (e.target.files != null) setImageFile(e.target.files[0]);
+              }}
             />
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Base Uri</FormLabel>
+            <FormLabel>Images Folder</FormLabel>
             <FormHelperText mb={3}>
-              Provide ipfs base Uri used to identify all NFTs of the collection.
-              Example: Base uri "https://ipfs.io/ipfs/QvTalyhCoX/" for token 3
-              will give "https://ipfs.io/ipfs/QvTalyhCoX/3".
+              Choose a folder for all token images. Please make sure all files
+              are named as followed : "X.[file_extension]" with X a number
+              starting from 0.
             </FormHelperText>
             <Input
-              type="text"
-              value={baseUri}
-              onChange={(e) => setBaseUri(e.target.value)}
+              type="file"
+              name="folderPicker"
+              webkitdirectory={"true"}
+              onChange={handleFolderSelection}
             />
           </FormControl>
         </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Type</FormLabel>
-            <RadioGroup onChange={setContractType} value={contractType}>
-              <Stack direction="row">
-                <Radio value="ERC721">ERC721</Radio>
-                <Radio value="ERC1155">ERC1155</Radio>
-              </Stack>
-            </RadioGroup>
-          </FormControl>
-        </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Creator earnings</FormLabel>
-            <FormHelperText mb={3}>
-              Define a price to be payed in order to mint an NFT from the
-              collection (ETH).
-            </FormHelperText>
-            <HStack maxW="full">
-              <Button {...dec}>-</Button>
-              <Input {...input} />
-              <Button {...inc}>+</Button>
-            </HStack>
-          </FormControl>
-        </Box>
-
         <Box mt={"2em"} w={"full"}>
           <FormControl>
             <FormLabel>Supply</FormLabel>
             <FormHelperText mb={3}>
-              You must specify the maximum amount of tokens that can be minted.
+              Specified from the number of files in the folder you have selected
             </FormHelperText>
-            <NumberInput
-              defaultValue={0}
-              min={1}
-              value={supply}
-              onChange={(num) => setSupply(parseInt(num))}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
+
+            <Tag size="lg" colorScheme="green" borderRadius="full">
+              <Text>{supply}</Text>
+            </Tag>
           </FormControl>
         </Box>
         <Button
+          isLoading={collectionIsSaving}
+          loadingText="Loading"
+          spinnerPlacement="end"
+          mt={"2em"}
           colorScheme={"purple"}
           bg={"purple.800"}
           color={"white"}
