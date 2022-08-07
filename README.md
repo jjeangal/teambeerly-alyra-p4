@@ -20,6 +20,9 @@ You can create a collection with a bunch of images (image folder) instead of cre
 ### Use the marketplace on server:
 Link: https://teambeerly-alyra-p4.vercel.app/
 
+#### How to use it:
+https://www.loom.com/share/61581f1f5044491d9bbf7e9235030a69
+
 #### Address of the contracts on Rinkeby:
 - Contract NFT: 0x13F8c49aA03DCeF7D83775505bbe857916Ba7169
 - Contract Marketplace: 0x76E16ABC630d8a95633377CD23fcF6e6eB76452a
