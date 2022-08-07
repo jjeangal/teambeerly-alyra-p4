@@ -56,7 +56,7 @@ export default function Token() {
   const setTokenSellingPrice = async () => {
     tokenSellingPrice = await marketPlaceContractAsSigner.getTotalPrice(params);
   };
-  setTokenSellingPrice();
+  // setTokenSellingPrice();
 
   const getToken = async function (params: any) {
     const collectionCIDJson = params[0];
@@ -136,7 +136,7 @@ export default function Token() {
                   <Box mb={"20px"}>Description : {tokenJson.description}</Box>
                 </VStack>
                 <Text fontSize={"30px"} mt={"1em"} whiteSpace={"nowrap"}>
-                  Price : {tokenSellingPrice + " " + networkCurrency}
+                  Price : {tokenSellingPrice || 1 + " " + networkCurrency}
                 </Text>
                 <Button
                   onClick={buyNFT}

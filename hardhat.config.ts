@@ -20,10 +20,10 @@ const config: HardhatUserConfig = {
             chainId: 31337,
             initialBaseFeePerGas: 0,
         },
-        // rinkeby: {
-        //     url: `https://rinkeby.infura.io/v3/${infuraApiKey}`,
-        //     accounts: [rinkebyPrivateKey],
-        // },
+        rinkeby: {
+            url: `https://rinkeby.infura.io/v3/${infuraApiKey}`,
+            accounts: [rinkebyPrivateKey],
+        },
     },
     paths: {
         sources: "./contracts",

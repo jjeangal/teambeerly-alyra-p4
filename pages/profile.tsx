@@ -41,6 +41,7 @@ export default function Profile() {
   //Get the NFT by the owner
   const getNFTByOwner = async () => {
     const nfts = await marketPlaceContractAsSigner.fetchSales(address);
+    console.log(nfts);
     setOwnedItems(nfts);
   };
 
@@ -129,6 +130,8 @@ export default function Profile() {
         });
         console.log("_allItems", _allItems);
         setAllItems(_allItems);
+
+        await getNFTByOwner();
       })();
     }
   }, [signer]);

@@ -77,23 +77,6 @@ export default function CardItem({ itemInfos }: CardProps) {
           <StatLabel>Price</StatLabel>
           <StatNumber>1 ETH</StatNumber>
         </Stat>
-
-        {/* TODO: Trigger sell function */}
-        <Link
-          href={`/sell-token/${itemInfos.collectionCID}/${itemInfos.index}`}
-          _hover={{
-            textDecoration: "none",
-          }}
-        >
-          <Button
-            colorScheme={"orange"}
-            bg={"orange.600"}
-            color={"white"}
-            variant="solid"
-          >
-            Sell
-          </Button>
-        </Link>
       </VStack>
     </Box>
   );
