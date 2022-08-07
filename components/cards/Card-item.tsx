@@ -79,14 +79,21 @@ export default function CardItem({ itemInfos }: CardProps) {
         </Stat>
 
         {/* TODO: Trigger sell function */}
-        <Button
-          colorScheme={"orange"}
-          bg={"orange.600"}
-          color={"white"}
-          variant="solid"
+        <Link
+          href={`/sell-token/${itemInfos.collectionCID}/${itemInfos.index}`}
+          _hover={{
+            textDecoration: "none",
+          }}
         >
-          Sell
-        </Button>
+          <Button
+            colorScheme={"orange"}
+            bg={"orange.600"}
+            color={"white"}
+            variant="solid"
+          >
+            Sell
+          </Button>
+        </Link>
       </VStack>
     </Box>
   );
