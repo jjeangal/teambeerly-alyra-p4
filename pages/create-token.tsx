@@ -108,15 +108,15 @@ export default function CreateToken() {
         </Box>
         <Box mt={"2em"} w={"full"}></Box>
         {/* Need to change to a search user's collection form (with none) */}
-        {/* <Box mt={"2em"} w={"full"}>
+        <Box mt={"2em"} w={"full"}>
           <FormControl>
-            <FormLabel>Collection</FormLabel>
+            <FormLabel>Choose a collection</FormLabel>
             <FormHelperText mb={3}>
               If you want to put the NFT on on of your collection:
             </FormHelperText>
             <Input type="text" />
           </FormControl>
-        </Box> */}
+        </Box>
         <Box mt={"3em"} w={"full"} onClick={createNFT}>
           <Button>create</Button>
         </Box>
