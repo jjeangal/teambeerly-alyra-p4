@@ -2,6 +2,9 @@ import {
   Box,
   Text,
   Image,
+  Flex,
+  SimpleGrid,
+  GridItem,
   HStack,
   chakra,
   VStack,
@@ -16,11 +19,13 @@ import {
   Heading,
   Center,
   Spinner,
+  Stack,
 } from "@chakra-ui/react";
+import { getJsonWalletAddress } from "ethers/lib/utils";
 import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
-import { networkCurrency } from "../../context/constants";
+import { factoryAddress } from "../../context/constants";
 import { MarketPlaceContext } from "../../context/MarketPlaceContext";
 import { ipfsInfura } from "../../services/ipfs.service";
 import { stripAddress } from "../../services/utils";
@@ -29,6 +34,12 @@ export default function Collection() {
   const router = useRouter();
   const { collectionAddress } = router.query;
   const { factoryContractAsSigner } = useContext(MarketPlaceContext);
+
+  const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [owner, setOwner] = useState("");
+  const [name, setName] = useState("");
+  const [items, setItems] = useState([]);
 
   const getCollectionCID = async (collectionAddress: any) => {
     try {
@@ -59,12 +70,34 @@ export default function Collection() {
     }
   };
 
+  const getOwnerOfCollection = async (collectionAddress: any) => {
+    try {
+      const eventFilter = factoryContractAsSigner.filters.CollectionCreated();
+      const events = await factoryContractAsSigner.queryFilter(eventFilter);
+      let owner = factoryAddress;
+      events.forEach((element: any) => {
+        if (element.args._collectionAddress == collectionAddress) {
+          owner = element.args._owner;
+        }
+      });
+      return owner;
+    } catch (error) {
+      console.log("Error when fetching collection owner : ", error);
+      return Promise.reject(error);
+    }
+  };
+
   useEffect(() => {
     if (collectionAddress) {
       (async () => {
         const collectionCID = await getCollectionCID(collectionAddress);
         const collectionMetadata = await getCollection(collectionCID);
-        console.log(collectionMetadata);
+        const owner = await getOwnerOfCollection(collectionAddress);
+        setOwner(owner);
+        setImageUrl(collectionMetadata.image);
+        setName(collectionMetadata.name);
+        setDescription(collectionMetadata.description);
+        setItems(collectionMetadata.items);
       })();
     }
   }, [collectionAddress]);
@@ -72,7 +105,47 @@ export default function Collection() {
   return (
     <>
       <Layout>
-        <span></span>
+        <Center>
+          <Box boxSize="md">
+            <Image src={" " + imageUrl} alt="Collection Image" />
+          </Box>
+        </Center>
+        <br />
+        <Flex>
+          <Text fontSize={"3xl"} fontWeight={"bold"}>
+            Name:
+          </Text>
+          <Text fontSize={"3xl"}>{" " + name}</Text>
+        </Flex>
+        <Flex>
+          <Text fontSize={"3xl"} fontWeight={"bold"}>
+            Owner:
+          </Text>
+          <Text fontSize={"3xl"}>{" " + owner}</Text>
+        </Flex>
+        <Flex>
+          <Text fontSize={"3xl"} fontWeight={"bold"}>
+            Description:
+          </Text>
+          <Text fontSize={"3xl"}>{" " + description}</Text>
+        </Flex>
+        <Flex>
+          <Text fontSize={"3xl"} fontWeight={"bold"}>
+            Collection Address:
+          </Text>
+          <Text fontSize={"3xl"}>{collectionAddress}</Text>
+        </Flex>
+        <br />
+        <SimpleGrid columns={3}>
+          {items.map((item: any) => (
+            <Stack key={item.name} boxSize="sm">
+              <Image src={item.image} alt="Token Image" />
+              <Center>
+                <Text>{item.name}</Text>
+              </Center>
+            </Stack>
+          ))}
+        </SimpleGrid>
       </Layout>
     </>
   );
