@@ -83,4 +83,21 @@ const getToken = async (params: any): Promise<any> => {
     }
 };
 
-export { uploadFileToIPFS, uploadFolderToIPFS, getToken };
+const getCollection = async (collectionCid: any) => {
+    try {
+        const fetchResponse = await fetch(
+            `${ipfsInfura}/${collectionCid}/_metadata.json`
+        );
+        if (fetchResponse.ok) {
+            const collectionMetaData = await fetchResponse.json();
+            return Promise.resolve(collectionMetaData);
+        } else {
+            alert("HTTP-Error: " + fetchResponse.status);
+        }
+    } catch (error) {
+        console.log("Error when fetching token metadata : ", error);
+        return Promise.reject(error);
+    }
+};
+
+export { uploadFileToIPFS, uploadFolderToIPFS, getToken, getCollection };

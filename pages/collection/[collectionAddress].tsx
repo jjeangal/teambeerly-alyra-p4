@@ -27,8 +27,7 @@ import { useContext, useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import { factoryAddress } from "../../context/constants";
 import { MarketPlaceContext } from "../../context/MarketPlaceContext";
-import { ipfsInfura } from "../../services/ipfs.service";
-import { stripAddress } from "../../services/utils";
+import { getCollection } from "../../services/ipfs.service";
 
 export default function Collection() {
   const router = useRouter();
@@ -47,23 +46,6 @@ export default function Collection() {
         collectionAddress
       );
       return Promise.resolve(baseUri);
-    } catch (error) {
-      console.log("Error when fetching token metadata : ", error);
-      return Promise.reject(error);
-    }
-  };
-
-  const getCollection = async (collectionCid: any) => {
-    try {
-      const fetchResponse = await fetch(
-        `${ipfsInfura}/${collectionCid}/_metadata.json`
-      );
-      if (fetchResponse.ok) {
-        const collectionMetaData = await fetchResponse.json();
-        return Promise.resolve(collectionMetaData);
-      } else {
-        alert("HTTP-Error: " + fetchResponse.status);
-      }
     } catch (error) {
       console.log("Error when fetching token metadata : ", error);
       return Promise.reject(error);
