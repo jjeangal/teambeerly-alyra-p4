@@ -1,6 +1,5 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
 
 const toWei = (num) => ethers.utils.parseEther(num.toString());
 const fromWei = (num) => ethers.utils.formatEther(num);
@@ -16,7 +15,7 @@ describe("NFT", function () {
     // Get accounts
     [deployer, addr1, addr2] = await ethers.getSigners();
     // Get contract
-    const NFT = await ethers.getContractFactory("NFT");
+    const NFT = await ethers.getContractFactory("BlyToken");
     const Marketplace = await ethers.getContractFactory("Marketplace");
     //Deploy contract
     nft = await NFT.deploy();
@@ -25,8 +24,8 @@ describe("NFT", function () {
 
   describe("Deployment", () => {
     it("Should track name and symbol of the NFT", async () => {
-      expect(await nft.name()).to.equal("First NFT");
-      expect(await nft.symbol()).to.equal("FIRST");
+      expect(await nft.name()).to.equal("Bly Token");
+      expect(await nft.symbol()).to.equal("BLY");
     });
     it("Should track feeAccount and feePercent of the marketplace", async () => {
       expect(await marketplace.feeAccount()).to.equal(deployer.address);

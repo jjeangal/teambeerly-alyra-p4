@@ -8,7 +8,7 @@ async function main() {
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
     // NFT contract
-    const NFT = await ethers.getContractFactory("NFT");
+    const NFT = await ethers.getContractFactory("BlyToken");
     const nft = await NFT.deploy();
     await nft.deployed();
     console.log("Contract NFT deployed to:", nft.address);

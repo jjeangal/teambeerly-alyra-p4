@@ -1,4 +1,4 @@
-import erc721JSon from "./NFT.json";
+import erc721JSon from "./BlyToken.json";
 import marketplaceJSon from "./Marketplace.json";
 import factoryJSon from "./NFTFactory.json";
 import { ChainId } from "@thirdweb-dev/sdk";

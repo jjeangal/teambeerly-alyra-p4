@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.14;
 
-import "./BlyToken.sol";
+import "./CustomNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -13,7 +13,7 @@ contract NFTFactory is ReentrancyGuard, Ownable {
   event NFTMinted(address _collectionAddress, uint256 _tokenId);
 
   /// Maps the collection addresses to the collection contracts
-  mapping(address => BlyToken) public collections;
+  mapping(address => CustomNFT) public collections;
   /// Maps the collection addresses to the contract owner addresses 
   mapping(address => address[]) public ownerToCollections;
  
@@ -27,7 +27,7 @@ contract NFTFactory is ReentrancyGuard, Ownable {
     string calldata _image,
     uint256 _maxSupply
   ) external returns (address) {
-    BlyToken newCollection = new BlyToken( _name, _symbol, _tokenUri, _image, _maxSupply);
+    CustomNFT newCollection = new CustomNFT( _name, _symbol, _tokenUri, _image, _maxSupply);
 
     address collectionAddress = address(newCollection);
 
