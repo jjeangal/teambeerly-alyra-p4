@@ -29,7 +29,7 @@ export default function Profile() {
   const address = useAddress() || "";
   const signer = useSigner();
   const [balance, setBalance] = useState("");
-  const [ownedItems, setOwnedItems] = useState();
+  const [ownedItems, setOwnedItems] = useState<any[]>([]);
   const [allItems, setAllItems] = useState<any[]>([]);
   const { hasCopied, onCopy } = useClipboard(address);
 
@@ -129,8 +129,6 @@ export default function Profile() {
         });
         console.log("_allItems", _allItems);
         setAllItems(_allItems);
-
-        await getAccountItemsOnMarketplace();
       })();
     }
   }, [signer]);
@@ -197,6 +195,19 @@ export default function Profile() {
               justifyContent={"center"}
             >
               {allItems.map((item: any, itemIndex: number) => (
+                <CardItem key={itemIndex} itemInfos={item}></CardItem>
+              ))}
+            </Flex>
+          )}
+          {ownedItems.length > 0 && (
+            <Flex
+              columnGap={"2em"}
+              rowGap={"3em"}
+              mt={"4em"}
+              flexWrap={"wrap"}
+              justifyContent={"center"}
+            >
+              {ownedItems.map((item: any, itemIndex: number) => (
                 <CardItem key={itemIndex} itemInfos={item}></CardItem>
               ))}
             </Flex>
