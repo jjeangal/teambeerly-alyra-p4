@@ -2,7 +2,7 @@ import { infuraPort, infuraUrl } from "../context/constants";
 import { create } from "ipfs-http-client";
 
 export const ipfsGateway = "https://ipfs.io/ipfs";
-const ipfsInfura = "https://ipfs.infura.io/ipfs";
+export const ipfsInfura = "https://ipfs.infura.io/ipfs";
 
 // Create IPFS clients
 const projectId = process.env.NEXT_PUBLIC_INFURA_PROJECT_ID || "";
@@ -57,7 +57,11 @@ const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
                 size: file.size,
             });
         }
-        return Promise.resolve(`${ipfsInfura}/${addedFiles[0].cid}`);
+        if (isBuffer) {
+            return Promise.resolve(`${ipfsInfura}/${addedFiles[0].cid}`);
+        } else {
+            return Promise.resolve(`${addedFiles[addedFiles.length - 1].cid}`);
+        }
     } catch (error) {
         console.log("Error when uploading file to IPFS:", error);
     }
@@ -65,7 +69,7 @@ const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
 
 const getIPFSImageUrl = (collectionCID: string, imageUrl?: string): string => {
     const _imageUrl = imageUrl ? `/${imageUrl}` : ``;
-    return `${ipfsGateway}/${collectionCID}${_imageUrl}`;
+    return `${ipfsInfura}/${collectionCID}${_imageUrl}`;
 };
 
 const getToken = async (params: any): Promise<any> => {

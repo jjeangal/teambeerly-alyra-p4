@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import {
   ipfsGateway,
+  ipfsInfura,
   uploadFileToIPFS,
   uploadFolderToIPFS,
 } from "../services/ipfs.service";
@@ -119,7 +120,6 @@ export default function CreateCollection() {
   const getImageIPFSUrl = async (acceptedFile: File): Promise<any> => {
     try {
       const url: string = await uploadFileToIPFS(acceptedFile);
-      console.log(url);
       return Promise.resolve(url);
     } catch (error) {
       console.log("ipfs image upload error: ", error);
@@ -128,9 +128,9 @@ export default function CreateCollection() {
 
   const getUriIPFS = async (acceptedFile: FileList) => {
     try {
-      const url: any = await uploadFolderToIPFS(acceptedFile);
-      const lastBaseUri = url[url.length - 1].cid;
-      return lastBaseUri;
+      const uri: any = await uploadFolderToIPFS(acceptedFile);
+      console.log("This is the uri: " + uri);
+      return uri;
     } catch (error) {
       console.log("ipfs image upload error: ", error);
     }
@@ -147,13 +147,11 @@ export default function CreateCollection() {
       const metadata = {
         name: `${name} #${i}`,
         description: `Welcome to the home of ${name} on OpenBatch. Discover the best items in this collection.`,
-        image: `${ipfsGateway}/${cidFolder}/${file.name}`,
+        image: `${ipfsInfura}/${cidFolder}/${file.name}`,
         date: new Date().toJSON(),
       };
-
       filesMetadata.push(metadata);
     }
-
     return filesMetadata;
   };
 
@@ -166,7 +164,7 @@ export default function CreateCollection() {
       name,
       description,
       image: urlBannerImage,
-      external_url: `${ipfsGateway}/${cidFolder}`,
+      external_url: `${ipfsInfura}/${cidFolder}`,
       items: itemsMetadatas,
     };
     return result;
@@ -231,9 +229,9 @@ export default function CreateCollection() {
           <FormControl>
             <FormLabel>Images Folder</FormLabel>
             <FormHelperText mb={3}>
-              Choose the folder for all the images. Please be sure that all
-              files are named like follow : "X.[file_extension]" with X a number
-              started to 0
+              Choose a folder for all token images. Please make sure all files
+              are named as followed : "X.[file_extension]" with X a number
+              starting from 0.
             </FormHelperText>
             <Input
               type="file"
@@ -241,20 +239,6 @@ export default function CreateCollection() {
               webkitdirectory={"true"}
               onChange={handleFolderSelection}
             />
-          </FormControl>
-        </Box>
-        <Box mt={"2em"} w={"full"}>
-          <FormControl>
-            <FormLabel>Creator earnings</FormLabel>
-            <FormHelperText mb={3}>
-              Define a price to be payed in order to mint an NFT from the
-              collection (ETH).
-            </FormHelperText>
-            <HStack maxW="full">
-              <Button {...dec}>-</Button>
-              <Input {...input} />
-              <Button {...inc}>+</Button>
-            </HStack>
           </FormControl>
         </Box>
         <Box mt={"2em"} w={"full"}>
