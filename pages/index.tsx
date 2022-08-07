@@ -18,12 +18,10 @@ import {
 import Link from "next/link";
 import CardLg from "../components/cards/Card-lg";
 import Layout from "../components/Layout/Layout";
-import { getAvatar } from "../services/utils";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper";
 import { useContext, useEffect } from "react";
 import { MarketPlaceContext } from "../context/MarketPlaceContext";
-import { getIPFSImageUrl } from "../services/ipfs.service";
 
 export default function Home() {
   const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);

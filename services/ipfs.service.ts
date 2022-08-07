@@ -64,11 +64,6 @@ const uploadFolderToIPFS = async (files: any, isBuffer = false) => {
     }
 };
 
-const getIPFSImageUrl = (collectionCID: string, imageUrl?: string): string => {
-    const _imageUrl = imageUrl ? `/${imageUrl}` : ``;
-    return `${ipfsInfura}/${collectionCID}${_imageUrl}`;
-};
-
 const getToken = async (params: any): Promise<any> => {
     const collectionCIDJson = params[0];
     const tokenId = params[1];
@@ -88,4 +83,4 @@ const getToken = async (params: any): Promise<any> => {
     }
 };
 
-export { getIPFSImageUrl, uploadFileToIPFS, uploadFolderToIPFS, getToken };
+export { uploadFileToIPFS, uploadFolderToIPFS, getToken };

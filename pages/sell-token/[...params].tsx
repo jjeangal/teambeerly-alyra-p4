@@ -21,11 +21,7 @@ import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import { MarketPlaceContext } from "../../context/MarketPlaceContext";
-import {
-  getIPFSImageUrl,
-  getToken,
-  ipfsGateway,
-} from "../../services/ipfs.service";
+import { getToken, ipfsGateway } from "../../services/ipfs.service";
 
 type TokenMetadata = {
   image: string;
