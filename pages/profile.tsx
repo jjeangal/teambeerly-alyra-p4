@@ -35,8 +35,7 @@ export default function Profile() {
 
   const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
 
-  const { marketPlaceContract, marketPlaceContractAsSigner } =
-    useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
   const getAccountItemsOnMarketplace = async () => {
     const items = await marketPlaceContractAsSigner.fetchSales();

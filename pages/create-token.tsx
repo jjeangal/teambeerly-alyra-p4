@@ -45,9 +45,7 @@ export default function CreateToken() {
 
   //Get contracts
   const {
-    marketPlaceContract,
     marketPlaceContractAsSigner,
-    blyTokenContract: erc721Contract,
     blyTokenContractAsSigner: erc721ContractAsSigner,
   } = useContext(MarketPlaceContext);
 
