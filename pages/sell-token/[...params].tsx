@@ -45,7 +45,7 @@ export default function SellToken() {
   const router = useRouter();
   const { params } = router.query;
 
-  const { marketPlaceContract } = useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -67,7 +67,7 @@ export default function SellToken() {
       (async () => {
         const token = await getToken(params);
         setTokenJson(token);
-        const _marketPlaceFees = await marketPlaceContract.feePercent();
+        const _marketPlaceFees = await marketPlaceContractAsSigner.feePercent();
         setMarketPlaceFees(_marketPlaceFees.toString());
       })();
     }

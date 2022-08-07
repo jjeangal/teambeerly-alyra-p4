@@ -26,16 +26,11 @@ import { MarketPlaceContext } from "../context/MarketPlaceContext";
 import { getIPFSImageUrl } from "../services/ipfs.service";
 
 export default function Home() {
-  const {
-    marketPlaceContract,
-    marketPlaceContractAsSigner,
-    blyTokenContract: erc721Contract,
-    blyTokenContractAsSigner: erc721ContractAsSigner,
-  } = useContext(MarketPlaceContext);
+  const { marketPlaceContractAsSigner } = useContext(MarketPlaceContext);
 
   async function getFees() {
     try {
-      const marketPlaceFees = await marketPlaceContract.feePercent();
+      const marketPlaceFees = await marketPlaceContractAsSigner.feePercent();
       console.log("marketPlaceFees (Home)", marketPlaceFees);
     } catch (error) {
       console.log(error);
@@ -43,11 +38,11 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (marketPlaceContract) {
-      console.log(marketPlaceContract);
+    if (marketPlaceContractAsSigner) {
+      console.log(marketPlaceContractAsSigner);
       getFees();
     }
-  }, [marketPlaceContract]);
+  }, [marketPlaceContractAsSigner]);
 
   const testCID = "QmPLNFPhYSMjRZPgEuYEvBEcFvg525aDsPKFnZTP2DjMTE";
 

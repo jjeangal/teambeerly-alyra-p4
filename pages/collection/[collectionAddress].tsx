@@ -18,17 +18,29 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import { networkCurrency } from "../../context/constants";
+import { MarketPlaceContext } from "../../context/MarketPlaceContext";
 import { ipfsInfura } from "../../services/ipfs.service";
 import { stripAddress } from "../../services/utils";
 
 export default function Collection() {
   const router = useRouter();
-  const { collectionCid } = router.query;
+  const { collectionAddress } = router.query;
+  const { factoryContractAsSigner } = useContext(MarketPlaceContext);
 
-  console.log("collectionCid : ", collectionCid);
+  const getCollectionCID = async (collectionAddress: any) => {
+    try {
+      const baseUri = await factoryContractAsSigner.getCollectionBaseUri(
+        collectionAddress
+      );
+      return Promise.resolve(baseUri);
+    } catch (error) {
+      console.log("Error when fetching token metadata : ", error);
+      return Promise.reject(error);
+    }
+  };
 
   const getCollection = async (collectionCid: any) => {
     try {
@@ -37,7 +49,6 @@ export default function Collection() {
       );
       if (fetchResponse.ok) {
         const collectionMetaData = await fetchResponse.json();
-        console.log("collectionMetaData", collectionMetaData);
         return Promise.resolve(collectionMetaData);
       } else {
         alert("HTTP-Error: " + fetchResponse.status);
@@ -48,17 +59,21 @@ export default function Collection() {
     }
   };
 
-  // const getImageUrl = (ipfsUrl: string): string => {
-  //   return ipfsUrl.replace("ipfs:/", `${IPFSUrl}`);
-  // };
-
   useEffect(() => {
-    if (collectionCid) {
+    if (collectionAddress) {
       (async () => {
-        const collectionJson = await getCollection(collectionCid);
+        const collectionCID = await getCollectionCID(collectionAddress);
+        const collectionMetadata = await getCollection(collectionCID);
+        console.log(collectionMetadata);
       })();
     }
-  }, [collectionCid]);
+  }, [collectionAddress]);
 
-  return <></>;
+  return (
+    <>
+      <Layout>
+        <span></span>
+      </Layout>
+    </>
+  );
 }

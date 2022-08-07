@@ -139,7 +139,7 @@ export default function CreateCollection() {
       );
       const newCollectionAddress = event.args._collectionAddress;
       console.log("newCollectionAddress", newCollectionAddress);
-      router.push(`/collection/${collectionBaseUri}`);
+      router.push(`/collection/${newCollectionAddress}`);
     } catch (error) {}
   };
 
