@@ -17,7 +17,7 @@ You can create a collection with a bunch of images (image folder) instead of cre
 
 ## Getting started
 
-### The easiest is to be on server
+### Use the marketplace on server
 Link: https://teambeerly-alyra-p4.vercel.app/
 
 ### After cloning this repository, install dependencies (NODE version >= 16.5.x recommended) :
